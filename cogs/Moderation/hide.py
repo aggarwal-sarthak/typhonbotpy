@@ -9,14 +9,16 @@ class hide(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.command(description='Hides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Hides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel]")
     async def hide(self, ctx):
-        channel = ctx.message.channel_mentions
+        channels = ctx.message.channel_mentions
         mentions = ""
-        if not channel:
-            channel = ctx.channel
-        for c in channel:
-            await c.set_permissions(ctx.guild.default_role, view_channel=False)
+        if not channels:
+            channels = [ctx.channel]
+        for c in channels:
+            perms = c.overwrites_for(ctx.guild.default_role)
+            perms.view_channel = False
+            await c.set_permissions(ctx.guild.default_role, overwrite=perms)
             mentions += "<#"+str(c.id)+"> " 
         await ctx.send(f'{self.client.emotes["success"]} | {mentions} Is Hidden!')
 
