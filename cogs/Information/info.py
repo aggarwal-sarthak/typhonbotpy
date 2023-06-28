@@ -38,7 +38,7 @@ class info(commands.Cog):
         
         await ctx.reply(embed=embedVar)
 
-    @help.error
+    @info.error
     async def missing_permissions(self, ctx, error):
         if isinstance(error, commands.BotMissingPermissions):
             err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
