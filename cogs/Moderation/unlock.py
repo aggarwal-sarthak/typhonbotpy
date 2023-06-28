@@ -9,14 +9,16 @@ class unlock(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.command(description='Unlocks Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Unlocks Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel]")
     async def unlock(self, ctx):
         channel = ctx.message.channel_mentions
         mentions = ""
         if not channel:
-            channel = ctx.channel
+            channel = [ctx.channel]
         for c in channel:
-            await c.set_permissions(ctx.guild.default_role, send_messages=True)
+            perms = c.overwrites_for(ctx.guild.default_role)
+            perms.send_messages=True
+            await c.set_permissions(ctx.guild.default_role, overwrite=perms)
             mentions += "<#"+str(c.id)+"> " 
         await ctx.send(f'{self.client.emotes["success"]} | {mentions} Is Unlocked!')
 
