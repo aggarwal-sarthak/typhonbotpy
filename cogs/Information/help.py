@@ -13,7 +13,6 @@ class help(commands.Cog):
     @commands.command(description='Returns The Help Menu For The Bot Commands', usage=f"{os.path.basename(__file__)[:-3]} [command]")
     async def help(self,ctx,*arg):
         if(len(arg)):
-            # if arg in self.client.commands:
             cmd = self.client.get_cog(arg[0].lower()).get_commands()
             menu = discord.Embed(title="Command Details",color=0xfb7c04, description=f"```- [] = Optional Arguments\n- <> = Required Arguments\n- Do Not Type These When Using Commands!```\n> {[c.description for c in cmd][0]}")
             try:
