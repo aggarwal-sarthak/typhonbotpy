@@ -13,9 +13,23 @@ class role(commands.Cog):
     async def role(self, ctx, mode, *ids):
         match mode:
             case 'add':
+                member_list=[]
+                role_list=[]
                 for id in ids:
                     member = ctx.guild.get_member(int(id))
                     role = ctx.guild.get_role(int(id))
+                    if role:
+                        if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
+                            await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Assign The Role `{role.name}`!")
+                        elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
+                            await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Assign The Role `{role.name}`!")
+                        else:
+                            role_list.append(id)
+                            
+                    if member:
+                        member_list.append(id)
+
+                print(role_list, member_list)
 
             case 'remove':
                 print(ids)
