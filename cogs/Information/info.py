@@ -13,6 +13,7 @@ class info(commands.Cog):
         global start_time
         start_time = datetime.datetime.now()
 
+    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns The Information About Bot', aliases=['botinfo'], usage=f"{os.path.basename(__file__)[:-3]}")
     async def info(self, ctx):
         embedVar = discord.Embed(title="TYPHON BOT",color=0xfb7c04)
@@ -36,6 +37,12 @@ class info(commands.Cog):
         embedVar.add_field(name="Vote Us",value="[Vote](https://top.gg/bot/756052319417925633/vote)",inline=False)
         
         await ctx.reply(embed=embedVar)
+
+    @help.error
+    async def missing_permissions(self, ctx, error):
+        if isinstance(error, commands.BotMissingPermissions):
+            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
+            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
 
 async def setup(client):
     await client.add_cog(info(client))

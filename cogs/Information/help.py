@@ -9,7 +9,8 @@ class help(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-    
+
+    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns The Help Menu For The Bot Commands', usage=f"{os.path.basename(__file__)[:-3]} [command]")
     async def help(self,ctx,*arg):
         if(len(arg)):
@@ -34,6 +35,12 @@ class help(commands.Cog):
                 embed.add_field(name=f"{folder} Commands",value=f"`{'`, `'.join([filename[:-3] for filename in os.listdir(f'./cogs/{folder}') if filename.endswith('.py')])}`",inline=False)
             embed.set_thumbnail(url=self.client.user.display_avatar)
             await ctx.reply(embed=embed)
+
+    @help.error
+    async def missing_permissions(self, ctx, error):
+        if isinstance(error, commands.BotMissingPermissions):
+            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
+            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
         
 async def setup(client):
     await client.add_cog(help(client))

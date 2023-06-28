@@ -21,17 +21,17 @@ client.emotes = emotes
 @client.command()
 async def load(ctx,extension):
     await client.load_extension(f'cogs.{extension}')
-    await ctx.reply(f"{client.emotes['success']} : Command {extension} Loaded Successfully!")
+    await ctx.reply(f"{client.emotes['success']} | Command {extension} Loaded Successfully!")
 
 @client.command()
 async def unload(ctx,extension):
     await client.unload_extension(f'cogs.{extension}')
-    await ctx.reply(f"{client.emotes['success']} : Command {extension} Unoaded Successfully!")
+    await ctx.reply(f"{client.emotes['success']} | Command {extension} Unloaded Successfully!")
 
 @client.command()
 async def reload(ctx,extension):
     await client.reload_extension(f'cogs.{extension}')
-    await ctx.reply(f"{client.emotes['success']} : Command {extension} Reloaded Successfully!")
+    await ctx.reply(f"{client.emotes['success']} | Command {extension} Reloaded Successfully!")
 
 @client.event
 async def on_ready():
@@ -47,6 +47,11 @@ async def main():
     async with client:
         await load()
         await client.start(config['token'])
+
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown `{error.retry_after:.2f}`s!")
 
 logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 asyncio.run(main())

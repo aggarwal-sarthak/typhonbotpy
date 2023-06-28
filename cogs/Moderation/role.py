@@ -9,6 +9,8 @@ class role(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.has_permissions(manage_roles=True)
+    @commands.bot_has_permissions(manage_roles=True)
     @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]}")
     async def role(self, ctx, mode, *ids):
         match mode:
@@ -35,6 +37,16 @@ class role(commands.Cog):
             case _:
                 print('wrong')
 
+    @role.error
+    async def missing_permissions(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
+            await ctx.reply(f"{self.client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
+
+        if isinstance(error, commands.BotMissingPermissions):
+            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
+            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
+            
 async def position_check(self, ctx, role):
     if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
         await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Assign The Role `{role.name}`!")
@@ -50,6 +62,8 @@ async def give_role(self, ctx, role_list, member_list, role_string, member_strin
     for m in member_list: member_string += "`" + ctx.guild.get_member(int(m)).name + "`,"
 
     await ctx.reply(f"{self.client.emotes['success']} | Added {role_string} To {member_string}!")
+
+
 
 async def setup(client):
     await client.add_cog(role(client))

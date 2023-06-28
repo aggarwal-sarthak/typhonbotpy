@@ -10,6 +10,8 @@ class setnick(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.has_permissions(manage_nicknames=True)
+    @commands.bot_has_permissions(manage_nicknames=True)
     @commands.command(description='Assigns Given Nickname To Mentioned User',aliases=['nick'], usage=f"{os.path.basename(__file__)[:-3]} <user> [nickname]")
     async def setnick(self, ctx, member:discord.Member=None, *nickname):
         if ctx.guild.owner_id == member.id or ctx.guild.get_member(self.client.user.id).top_role.position <= member.top_role.position:
@@ -26,6 +28,16 @@ class setnick(commands.Cog):
             else:
                 await member.edit(nick=nickname[0])
                 await ctx.reply(f"{self.client.emotes['success']} | Changed `{member.name}`'s Nickname To `{nickname[0]}`!")
+
+    @setnick.error
+    async def missing_permissions(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
+            await ctx.reply(f"{self.client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
+
+        if isinstance(error, commands.BotMissingPermissions):
+            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
+            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
 
 async def setup(client):
     await client.add_cog(setnick(client))
