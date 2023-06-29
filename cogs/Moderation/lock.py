@@ -11,7 +11,7 @@ class lock(commands.Cog):
 
     @commands.has_permissions(manage_channels=True)
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.command(description='Locks Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel]")
+    @commands.command(description='Locks Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel(s)]")
     async def lock(self, ctx):
         channel = ctx.message.channel_mentions
         mentions = ""

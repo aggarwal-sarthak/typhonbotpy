@@ -11,7 +11,7 @@ class role(commands.Cog):
 
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove [bots/humans/all] <role(s)> [user(s)]")
     async def role(self, ctx, mode, *ids):
         ids = await parse_ids(ids)
         member_list=[]
@@ -77,7 +77,7 @@ async def give_role(self, ctx, role_list, member_list, role_string, member_strin
     for r in role_list: role_string += "`" + ctx.guild.get_role(int(r)).name + "`,"
     for m in member_list: member_string += "`" + ctx.guild.get_member(int(m)).name + "`,"
 
-    await ctx.reply(f"{self.client.emotes['success']} | Added {role_string} To {member_string}!")
+    await ctx.reply(f"{self.client.emotes['success']} | Added {role_string[:-1]} To {member_string[:-1]}!")
 
 async def setup(client):
     await client.add_cog(role(client))

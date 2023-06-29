@@ -16,11 +16,12 @@ class help(commands.Cog):
         if(len(arg)):
             cmd = self.client.get_cog(arg[0].lower()).get_commands()
             menu = discord.Embed(title="Command Details",color=0xfb7c04, description=f"```- [] = Optional Arguments\n- <> = Required Arguments\n- Do Not Type These When Using Commands!```\n> {[c.description for c in cmd][0]}")
-            try:
-                menu.add_field(name="Aliases", value=f"`{['`, `'.join(c.aliases) for c in cmd][0]}`")
-                menu.add_field(name="Usage", value=f"`{self.client.config['prefix']+[c.usage for c in cmd][0]}`")
-            except:
-                pass
+            if [c.aliases for c in cmd][0]:
+                aliases = ['`, `'.join(c.aliases) for c in cmd][0]
+            else:
+                aliases = "None"
+            menu.add_field(name="Aliases", value=f"`{aliases}`")
+            menu.add_field(name="Usage", value=f"`{self.client.config['prefix']+[c.usage for c in cmd][0]}`")
             await ctx.reply(embed=menu)
         else:
             embed = discord.Embed(title=None,color=0xfb7c04)
