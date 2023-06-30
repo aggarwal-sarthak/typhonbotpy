@@ -35,7 +35,7 @@ async def reload(ctx,extension):
 
 @client.event
 async def on_ready():
-    print(f'✅ | {client.user.name}{client.user.discriminator} Is Ready!')
+    print(f'✅ | {client.user.name} Is Ready!')
 
 async def load():
     for folder in os.listdir("./cogs"):
