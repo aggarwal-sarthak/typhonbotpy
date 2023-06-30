@@ -12,7 +12,7 @@ class serverinfo(commands.Cog):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(description='Returns Bot Ping', usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Returns Serverinfo', usage=f"{os.path.basename(__file__)[:-3]}")
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def serverinfo(self, ctx):
         roles = []
