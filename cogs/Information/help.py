@@ -24,8 +24,7 @@ class help(commands.Cog):
             menu.add_field(name="Usage", value=f"`{self.client.config['prefix']+[c.usage for c in cmd][0]}`")
             await ctx.reply(embed=menu)
         else:
-            embed = discord.Embed(title=None,color=0xfb7c04)
-            embed.set_author(name=ctx.author,icon_url=ctx.author.avatar)
+            embed = discord.Embed(title="TYPHON BOT Commands",color=0xfb7c04)
             embed.add_field(name="",value=f"{self.client.emotes['success']} : Prefix For This Server : `{self.client.config['prefix']}`\n\
                             {self.client.emotes['success']} : Total Bot Commands : `{len(self.client.commands)}`\n\
                             {self.client.emotes['success']} : Type {self.client.config['prefix']}help <command> For More Info\n\
@@ -35,6 +34,7 @@ class help(commands.Cog):
             for folder in os.listdir('./cogs'):
                 embed.add_field(name=f"{folder} Commands",value=f"`{'`, `'.join([filename[:-3] for filename in os.listdir(f'./cogs/{folder}') if filename.endswith('.py')])}`",inline=False)
             embed.set_thumbnail(url=self.client.user.display_avatar)
+            embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             await ctx.reply(embed=embed)
 
     @help.error

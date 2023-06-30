@@ -61,7 +61,6 @@ class userinfo(commands.Cog):
         except:
             pass
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
-
         await ctx.reply(embed=embed)
 
     @userinfo.error

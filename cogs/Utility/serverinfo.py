@@ -37,6 +37,7 @@ class serverinfo(commands.Cog):
         embed.add_field(name=f"**__Roles [{len(ctx.guild.roles)-1}]__**", value=", ".join(roles[:-1]), inline=False)
         if ctx.guild.icon: embed.set_thumbnail(url=ctx.guild.icon)
         if ctx.guild.banner : embed.set_image(url=ctx.guild.banner)
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)
 
     @serverinfo.error

@@ -35,7 +35,7 @@ class info(commands.Cog):
         embedVar.add_field(name="Support Server",value="[Support Server](https://discord.gg/5UqVvZj)",inline=False)
         embedVar.add_field(name="Invite Bot",value="[Invite](https://discord.com/api/oauth2/authorize?client_id=756052319417925633&permissions=2113268958&redirect_uri=https%3A%2F%2Fdiscord.com%2Finvite%2F5UqVvZj&response_type=code&scope=bot%20guilds.join%20applications.commands)",inline=False)
         embedVar.add_field(name="Vote Us",value="[Vote](https://top.gg/bot/756052319417925633/vote)",inline=False)
-        
+        embedVar.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embedVar)
 
     @info.error
