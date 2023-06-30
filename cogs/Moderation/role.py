@@ -12,12 +12,16 @@ class role(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove [bots/humans/all] <role(s)> [user(s)]")
-    async def role(self, ctx, mode, *ids):
+    async def role(self, ctx, mode=None, *ids):
         ids = await parse_ids(ids)
+        if(len(ids)==0):
+            await ctx.invoke(self.client.get_command('help'),"role")
+            return
         member_list=[]
         role_list=[]
         member_string=""
         role_string="" 
+        
         if(ids[0] in ["all","a"]):
             for member in ctx.message.guild.members:
                 member_list.append(str(member.id))
@@ -45,15 +49,18 @@ class role(commands.Cog):
                 if member:
                     member_list.append(id)
     
-        match mode:
-            case 'add':
+        if(len(member_list)==0 or len(role_list)==0):
+            await ctx.invoke(self.client.get_command('help'),"role")
+        else:
+            match mode:
+                case 'add':
 
-                await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
+                    await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
 
-            case 'remove':
-                await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
-            case _:
-                print('wrong')
+                case 'remove':
+                    await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
+                case _:
+                    await ctx.invoke(self.client.get_command('help'),"role")
 
     @role.error
     async def missing_permissions(self, ctx, error):
