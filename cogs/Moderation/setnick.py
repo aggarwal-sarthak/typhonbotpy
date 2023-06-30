@@ -14,6 +14,8 @@ class setnick(commands.Cog):
     @commands.bot_has_permissions(manage_nicknames=True)
     @commands.command(description='Assigns Given Nickname To Mentioned User',aliases=['nick'], usage=f"{os.path.basename(__file__)[:-3]} <user> [nickname]")
     async def setnick(self, ctx, member:discord.Member=None, *nickname):
+        if not member:
+            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
         if ctx.guild.owner_id == member.id or ctx.guild.get_member(self.client.user.id).top_role.position <= member.top_role.position:
             await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Change `{member.name}`'s Nickname!")
         elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= member.top_role.position:

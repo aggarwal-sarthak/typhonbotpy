@@ -15,7 +15,7 @@ class role(commands.Cog):
     async def role(self, ctx, mode=None, *ids):
         ids = await parse_ids(ids)
         if(len(ids)==0):
-            await ctx.invoke(self.client.get_command('help'),"role")
+            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
             return
         member_list=[]
         role_list=[]
@@ -50,17 +50,15 @@ class role(commands.Cog):
                     member_list.append(id)
     
         if(len(member_list)==0 or len(role_list)==0):
-            await ctx.invoke(self.client.get_command('help'),"role")
+            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
         else:
             match mode:
                 case 'add':
-
                     await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
-
                 case 'remove':
                     await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
                 case _:
-                    await ctx.invoke(self.client.get_command('help'),"role")
+                    await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
 
     @role.error
     async def missing_permissions(self, ctx, error):

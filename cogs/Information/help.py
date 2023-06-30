@@ -11,7 +11,7 @@ class help(commands.Cog):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(description='Returns The Help Menu For The Bot Commands', usage=f"{os.path.basename(__file__)[:-3]} [command]")
+    @commands.command(description='Returns Help Menu For The Bot Commands', usage=f"{os.path.basename(__file__)[:-3]} [command]")
     async def help(self,ctx,*arg):
         if(len(arg)):
             cmd = self.client.get_cog(arg[0].lower()).get_commands()

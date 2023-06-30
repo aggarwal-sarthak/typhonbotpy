@@ -14,7 +14,7 @@ class info(commands.Cog):
         start_time = datetime.datetime.now()
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(description='Returns The Information About Bot', aliases=['botinfo'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Returns Information About Bot', aliases=['botinfo'], usage=f"{os.path.basename(__file__)[:-3]}")
     async def info(self, ctx):
         embedVar = discord.Embed(title="TYPHON BOT",color=0xfb7c04)
         embedVar.set_thumbnail(url=self.client.user.avatar)

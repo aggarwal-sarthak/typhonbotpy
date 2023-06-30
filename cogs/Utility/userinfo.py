@@ -12,7 +12,7 @@ class userinfo(commands.Cog):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(description="Returns Userinfo For The Mentioned User", aliases=['user', 'ui', 'about'], usage=f"{os.path.basename(__file__)[:-3]} [User]")
+    @commands.command(description="Returns Information For The Mentioned User", aliases=['user', 'ui', 'about'], usage=f"{os.path.basename(__file__)[:-3]} [User]")
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def userinfo(self, ctx, member:discord.Member=None):
         if not member:
