@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import datetime,timeago
+import pytz
 
 class userinfo(commands.Cog):
     def __init__(self, client):
@@ -43,7 +44,7 @@ class userinfo(commands.Cog):
         for badge in badges:
             badge_text += self.client.emotes[f'{badge.name}']+" "
         now = datetime.datetime.now()
-        embed.add_field(name="**__General Information__**", value=f"**Name :** {member}\n**ID :** {member.id}\n**Nickname :** {member.nick}\n**Badges :** {badge_text}\n**Account Creation :** {timeago.format(member.created_at.replace(tzinfo=None),now)}\n**Server Joined :** {timeago.format(member.joined_at.replace(tzinfo=None),now)}", inline=False)
+        embed.add_field(name="**__General Information__**", value=f"**Name :** {member}\n**ID :** {member.id}\n**Nickname :** {member.nick}\n**Badges :** {badge_text}\n**Account Creation :** {timeago.format(member.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}\n**Server Joined :** {timeago.format(member.joined_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}", inline=False)
         if len(str(", ".join([x.mention for x in member.roles])))>1024:
             embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**", value="Too Many To Display!", inline=False)
         else:
