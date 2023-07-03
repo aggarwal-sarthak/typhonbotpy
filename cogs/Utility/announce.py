@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import os
+import discord
 
 class announce(commands.Cog):
     def __init__(self, client):
@@ -9,10 +10,11 @@ class announce(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-    
+
     @commands.command()
-    async def announce(self,ctx,*channel):
-        if(not channel):channel = ctx.channel
+    async def announce(self, ctx, channel: discord.TextChannel=None):
+        if not channel:
+            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
 
         bot_embed = discord.Embed(title='Embed Builder : Title',description="Enter The Title Of The Announcement\n[Note] : The Title Must Not Exceed 256 Character Limit\n\n[None] : Type None For No Title\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
         await ctx.reply(embed=bot_embed)
@@ -59,9 +61,35 @@ class announce(commands.Cog):
         user_embed.set_thumbnail(url=thumbnail)
         user_embed.set_image(url=image)
         user_embed.set_footer(text=footer)
-        await ctx.reply(embed=user_embed)
+        self.send_channel = channel
+        self.send_embed = user_embed
+        view = Buttons()
 
+        msg = await ctx.reply(embed=user_embed, view=view)
+        await view.wait()
+        if view.value == "1":
+            if msg: await msg.delete()
+            await ctx.reply(f"{self.client.emotes['success']} | Message Announced Successfully!")
+            await channel.send(embed=user_embed)
+        if view.value == "2":
+            await ctx.reply(f"{self.client.emotes['failed']} | Message Cancelled Successfully!")
 
+class Buttons(discord.ui.View):
+    def __init__ (self, *, timeout=60):
+        super().__init__(timeout=timeout)
+    @discord.ui.button(label="Send", style=discord.ButtonStyle.green)
+    async def button1_call(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.value = "1"
+        self.stop()
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
+    async def button2_call(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.value = "2"
+        self.stop()
+    @discord.ui.button(label="Edit")
+    async def button3_call(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.value = "3"
+        self.stop()
+        
 async def get_color(self,ctx):
     color = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
     if(color.content.lower()=="cancel"):return
@@ -80,10 +108,8 @@ async def get_color(self,ctx):
                 color = await get_color(self,ctx)
         return color
 
-
 async def setup(client):
     await client.add_cog(announce(client)) 
-
 
 async def parse_input(input):
     if(input.content.lower()=="none"):
