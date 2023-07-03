@@ -61,8 +61,6 @@ class announce(commands.Cog):
         user_embed.set_thumbnail(url=thumbnail)
         user_embed.set_image(url=image)
         user_embed.set_footer(text=footer)
-        self.send_channel = channel
-        self.send_embed = user_embed
         view = Buttons()
 
         msg = await ctx.reply(embed=user_embed, view=view)
