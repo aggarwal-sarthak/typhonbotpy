@@ -118,16 +118,19 @@ async def get_thumbnail(self,ctx,user_embed):
         exit()
     else:
         thumbnail = await parse_input(thumbnail)
-        if(await verif_url(thumbnail)):
-            user_embed.set_thumbnail(url=thumbnail)
-            print("\n\n\n\n\n\n\here")
+        if(thumbnail!=None):
+            if(await verif_url(thumbnail)):
+                user_embed.set_thumbnail(url=thumbnail)
+                print("\n\n\n\n\n\n\here")
+            else:
+                await ctx.reply("vapas daal")
+                await get_thumbnail(self,ctx,user_embed)
         else:
-            await ctx.reply("vapas daal")
-            await get_thumbnail(self,ctx,user_embed)
+            return
 
 async def verif_url(url):
     if(url.startswith("http://") or url.startswith("https://")):
-        for i in ['.jpg','.jpeg']:
+        for i in ['.jpg','.jpeg','.png','.webp']:
             if i in url:
                 return True
     return False
@@ -141,11 +144,14 @@ async def get_image(self,ctx,user_embed):
         exit()
     else:
         image = await parse_input(image)
-        if(await verif_url(image)):
-            user_embed.set_image(url=image)
+        if(image!=None):
+            if(await verif_url(image)):
+                user_embed.set_image(url=image)
+            else:
+                await ctx.reply("vapas daal")
+                await get_image(self,ctx,user_embed)
         else:
-            await ctx.reply("vapas daal")
-            await get_image(self,ctx,user_embed)
+            return  
 
     
 
