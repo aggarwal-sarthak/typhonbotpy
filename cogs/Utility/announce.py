@@ -26,19 +26,21 @@ class announce(commands.Cog):
         embed_dict['description'] = await get_description(self,ctx)
 
         embed_dict['color'] = await get_color(self,ctx)
+        
+        user_embed = await create_embed(self,ctx,embed_dict)
 
-        embed_dict['thumbnail'] =  await get_thumbnail(self,ctx)
+        await get_thumbnail(self,ctx,user_embed)
 
-        embed_dict['image'] = await get_image(self,ctx)
+        await get_image(self,ctx,user_embed)
 
-        embed_dict['footer'] = await get_footer(self,ctx)
+        await get_footer(self,ctx,user_embed)
+
+            
+
         try:
-
-            user_embed = await create_embed(embed_dict)
+            await send_view(self,ctx,channel,user_embed,embed_dict)
         except Exception as e:
             print("\n\n\n\n\n\n",e)
-
-        await send_view(self,ctx,channel,user_embed,embed_dict)
             
 
 class Buttons(discord.ui.View):
@@ -107,7 +109,7 @@ async def get_color(self,ctx):
         return color
 
 
-async def get_thumbnail(self,ctx):
+async def get_thumbnail(self,ctx,user_embed):
     bot_embed = discord.Embed(title='Embed Builder : Thumbnail',description="Enter The Thumbnail Of The Announcement\n[Note] : The Thumbnail Must Be In Link Format\n\n[None] : Type None For No Thumbnail\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     thumbnail = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
@@ -116,9 +118,21 @@ async def get_thumbnail(self,ctx):
         exit()
     else:
         thumbnail = await parse_input(thumbnail)
-    return thumbnail
+        if(await verif_url(thumbnail)):
+            user_embed.set_thumbnail(url=thumbnail)
+            print("\n\n\n\n\n\n\here")
+        else:
+            await ctx.reply("vapas daal")
+            await get_thumbnail(self,ctx,user_embed)
 
-async def get_image(self,ctx):
+async def verif_url(url):
+    if(url.startswith("http://") or url.startswith("https://")):
+        for i in ['.jpg','.jpeg']:
+            if i in url:
+                return True
+    return False
+
+async def get_image(self,ctx,user_embed):
     bot_embed = discord.Embed(title='Embed Builder : Image',description="Enter The Image Of The Announcement\n[Note] : The Image Must Be In Link Format\n\n[None] : Type None For No Image\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     image = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
@@ -127,9 +141,15 @@ async def get_image(self,ctx):
         exit()
     else:
         image = await parse_input(image)
-    return image
+        if(await verif_url(image)):
+            user_embed.set_image(url=image)
+        else:
+            await ctx.reply("vapas daal")
+            await get_image(self,ctx,user_embed)
 
-async def get_footer(self,ctx):
+    
+
+async def get_footer(self,ctx,user_embed):
     bot_embed = discord.Embed(title='Embed Builder : Footer',description="Enter The Footer Of The Announcement\n[Note] : The Footer Must Not Exceed 2048 Character Limit\n\n[None] : Type None For No Footer\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     footer = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
@@ -138,7 +158,7 @@ async def get_footer(self,ctx):
         exit()
     else:
         footer = await parse_input(footer)
-    return footer
+        user_embed.set_footer(text=footer)
 
 async def parse_input(input):
     if(input.content.lower()=="none"):
@@ -147,11 +167,8 @@ async def parse_input(input):
         input = input.content
     return input
 
-async def create_embed(dict):
+async def create_embed(self,ctx,dict):
     user_embed=discord.Embed(title=dict['title'],description=dict['description'],color=dict['color'])
-    user_embed.set_thumbnail(url=dict['thumbnail'])
-    user_embed.set_image(url=dict['image'])
-    user_embed.set_footer(text=dict['footer'])
     return user_embed
 
 async def send_view(self,ctx,channel,user_embed,embed_dict):
@@ -173,9 +190,24 @@ async def send_view(self,ctx,channel,user_embed,embed_dict):
             case "title":
                 title = await get_title(self,ctx)
                 embed_dict['title'] = title
-                user_embed = await create_embed(embed_dict)
+                user_embed = await create_embed(self,ctx,embed_dict)
                 await send_view(self,ctx,channel,user_embed,embed_dict)
-            
+            case "description":
+                description = await get_description(self,ctx)
+                embed_dict['description'] = description
+                user_embed = await create_embed(self,ctx,embed_dict)
+                await send_view(self,ctx,channel,user_embed,embed_dict)
+            case "color":
+                color = await get_color(self,ctx)
+                embed_dict['color'] = color
+                user_embed = await create_embed(self,ctx,embed_dict)
+                await send_view(self,ctx,channel,user_embed,embed_dict)
+            case "thumbnail":
+                await get_thumbnail(self,ctx,user_embed)
+                await send_view(self,ctx,channel,user_embed,embed_dict) 
+            case _:
+                await ctx.reply("not a valid input")
+
 
 
 
