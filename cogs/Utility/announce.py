@@ -75,7 +75,7 @@ async def get_color(self,ctx):
     else:
         color = await parse_input(color)
         if(color):
-            method = getattr(discord.Color, color, None)
+            method = getattr(discord.Color, color.lower()   , None)
             if method and callable(method):
                 color = method()
             elif(color.startswith("#")):
@@ -106,10 +106,14 @@ async def get_thumbnail(self,ctx,user_embed):
             return
 
 async def verif_url(url):
-    if(url.startswith("http://") or url.startswith("https://")):
-        for i in ['.jpg','.jpeg','.png','.webp']:
-            if i in url:
-                return True
+    try:
+        if(url.startswith("http://") or url.startswith("https://")):
+            for i in ['.jpg','.jpeg','.png','.webp']:
+                if i in url:
+                    print("\n\n\n\n\n in verif")
+                    return True
+    except Exception as e:
+        print("\n\n\n\n\n",e)
     return False
 
 async def get_image(self,ctx,user_embed):
