@@ -53,7 +53,5 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown `{error.retry_after:.2f}`s!")
 
-logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
-logging.basicConfig(stream=sys.stdout, level=logging.CRITICAL)
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 asyncio.run(main())
