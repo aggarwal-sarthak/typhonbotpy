@@ -108,14 +108,10 @@ async def get_thumbnail(self,ctx,user_embed):
             return
 
 async def verif_url(url):
-    try:
-        if(url.startswith("http://") or url.startswith("https://")):
-            for i in ['.jpg','.jpeg','.png','.webp']:
-                if i in url:
-                    print("\n\n\n\n\n in verif")
-                    return True
-    except Exception as e:
-        print("\n\n\n\n\n",e)
+    if(url.startswith("http://") or url.startswith("https://")):
+        for i in ['.jpg','.jpeg','.png','.webp']:
+            if i in url:
+                return True
     return False
 
 async def get_image(self,ctx,user_embed):
