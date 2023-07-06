@@ -11,7 +11,9 @@ class announce(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.bot_has_permissions(administrator=True)
     @commands.command(description="Embed Builder",aliases=['embed','ann'],usage=f"{os.path.basename(__file__)[:-3]} <Channel>")
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def announce(self, ctx, channel: discord.TextChannel=None):
         if channel is None:
             await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
