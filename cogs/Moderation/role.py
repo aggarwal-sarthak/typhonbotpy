@@ -11,7 +11,7 @@ class role(commands.Cog):
 
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove [bots/humans/all] <role(s)> [user(s)]")
+    @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
     async def role(self, ctx, mode=None, *ids):
         ids = await parse_ids(ids)
         if(len(ids)==0):

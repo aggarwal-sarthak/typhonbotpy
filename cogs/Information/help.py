@@ -21,7 +21,8 @@ class help(commands.Cog):
             else:
                 aliases = "None"
             menu.add_field(name="Aliases", value=f"`{aliases}`")
-            menu.add_field(name="Usage", value=f"`{self.client.config['prefix']+[c.usage for c in cmd][0]}`")
+            usage = (self.client.config["prefix"]+[c.usage for c in cmd][0]).replace('\n',f'\n{self.client.config["prefix"]}')
+            menu.add_field(name="Usage", value=f'`{usage}`')
             await ctx.reply(embed=menu)
         else:
             embed = discord.Embed(title="TYPHON BOT Commands",color=0xfb7c04)
