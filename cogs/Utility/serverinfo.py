@@ -41,11 +41,5 @@ class serverinfo(commands.Cog):
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)
 
-    @serverinfo.error
-    async def missing_permissions(self, ctx, error):
-        if isinstance(error, commands.BotMissingPermissions):
-            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
-            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
-
 async def setup(client):
     await client.add_cog(serverinfo(client))

@@ -60,16 +60,6 @@ class role(commands.Cog):
                 case _:
                     await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
 
-    @role.error
-    async def missing_permissions(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
-            err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
-            await ctx.reply(f"{self.client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
-
-        if isinstance(error, commands.BotMissingPermissions):
-            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
-            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
-
 async def parse_ids(ids):
     parsed_ids = []
     for id in ids:

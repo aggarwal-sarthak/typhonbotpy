@@ -23,11 +23,5 @@ class firstmsg(commands.Cog):
         
         await ctx.reply(f"{self.client.emotes['failed']} | No Message Found By `{member.name}`!")
 
-    @firstmsg.error
-    async def missing_permissions(self, ctx, error):
-        if isinstance(error, commands.BotMissingPermissions):
-            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
-            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
-
 async def setup(client):
     await client.add_cog(firstmsg(client))
