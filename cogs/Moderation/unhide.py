@@ -24,15 +24,5 @@ class unhide(commands.Cog):
             mentions += "<#"+str(c.id)+"> " 
         await ctx.reply(f'{self.client.emotes["success"]} | {mentions} Is Unhidden!')
 
-    @unhide.error
-    async def missing_permissions(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
-            err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
-            await ctx.reply(f"{self.client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
-
-        if isinstance(error, commands.BotMissingPermissions):
-            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
-            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
-
 async def setup(client):
     await client.add_cog(unhide(client))

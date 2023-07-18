@@ -34,16 +34,6 @@ class announce(commands.Cog):
         await get_footer(self,ctx,user_embed)
         await send_view(self,ctx,channel,user_embed,embed_dict)
 
-    @announce.error
-    async def missing_permissions(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
-            err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
-            await ctx.reply(f"{self.client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
-
-        if isinstance(error, commands.BotMissingPermissions):
-            err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
-            await ctx.reply(f"{self.client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
-
 class Buttons(discord.ui.View):
     def __init__ (self, ctx, *, timeout=60):
         super().__init__(timeout=timeout)

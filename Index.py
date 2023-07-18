@@ -53,5 +53,13 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown `{error.retry_after:.2f}`s!")
 
+    if isinstance(error, commands.MissingPermissions):
+        err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
+        await ctx.reply(f"{client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
+
+    if isinstance(error, commands.BotMissingPermissions):
+        err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
+        await ctx.reply(f"{client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
+
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 asyncio.run(main())
