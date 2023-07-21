@@ -5,7 +5,8 @@ import asyncio
 import json
 import logging
 import sys
-
+from datetime import datetime
+import time 
 with open('config.json', 'r') as f:
     config = json.load(f)
 with open('emoji.json', 'r') as f:
@@ -51,15 +52,20 @@ async def main():
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
-        await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown `{error.retry_after:.2f}`s!")
+        now = datetime.now()
+        now = datetime.timestamp(now)
+        reply = await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown! Try again <t:{int(now+error.retry_after)}:R> !")
+        print("\n\n\n\n\ngoing to sleep")
+        time.sleep(error.retry_after)
+        print("\n\n\n\n\nfrom sleep")
+        await reply.delete()
 
     if isinstance(error, commands.MissingPermissions):
         err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
         await ctx.reply(f"{client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
-
     if isinstance(error, commands.BotMissingPermissions):
         err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
         await ctx.reply(f"{client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-asyncio.run(main())
+asyncio.run(main()) 
