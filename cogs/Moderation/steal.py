@@ -1,4 +1,3 @@
-
 import discord
 from discord.ext import commands
 from discord import Button
@@ -26,7 +25,6 @@ class steal(commands.Cog):
             emoji = []
             if(ctx.message.reference is not None):
                 msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-                print("\n\n\n\n\n",msg.attachments)
                 if(len(msg.stickers)>0):
                     sticker = msg.stickers[0]
                 else:
@@ -40,20 +38,20 @@ class steal(commands.Cog):
                 else:
                     await ctx.reply(f"{self.client.emotes['failed']}| No emojis or stickers found!")
             if(len(emoji)>0):
-                await send_view(self,ctx,emoji)
-                page = 0 
                 name, url = await get_name_url(emoji)
-                embed = await create_embed(url,page)
-                view = Buttons(ctx)
-                message = await ctx.reply(embed=embed,view=view)
-                await view.wait()
+                await send_view(self,ctx,emoji,name,url)
+                # page = 0 
+                # name, url = await get_name_url(emoji)
+                # embed = await create_embed(url,page)
+                # view = Buttons(ctx)
+                # message = await ctx.reply(embed=embed,view=view)
+                # await view.wait()
             else:
                 pass
         except Exception as e:
             print("\n\n\n\n\n\n",e)
 
-async def send_view(self,ctx,emoji,page=0):
-    name, url = await get_name_url(emoji)
+async def send_view(self,ctx,emoji,name,url,page=0):
     embed = await create_embed(url,page)
     view = Buttons(ctx)
     msg = await ctx.reply(embed=embed,view=view)
@@ -62,10 +60,10 @@ async def send_view(self,ctx,emoji,page=0):
         if msg: await msg.delete()
         if(page==0):
             await ctx.reply("Cannot go back!")
-            await send_view(self,ctx,emoji)
+            await send_view(self,ctx,emoji,name,url,page)
         else:
             page -= 1
-            await send_view(self,ctx,emoji,page)
+            await send_view(self,ctx,emoji,name,url,page)
         return False
     if view.value == "2":
         if msg: await msg.delete()
@@ -83,16 +81,18 @@ async def send_view(self,ctx,emoji,page=0):
                         img_or_gif = BytesIO(await r.read())
                         b_value = img_or_gif.getvalue()
                         if r.status in range(200, 299):
-                            emoji = await guild.create_custom_emoji(image=b_value, name=name[page])
-                            await ctx.send(f'Successfully created emoji: <:{name[page]}:{emoji.id}>')
+                            emj = await guild.create_custom_emoji(image=b_value, name=name[page])
+                            print(f'Successfully created emoji: <:{emj.name}:{emj.id}>')
+                            await ctx.send(f'Successfully created emoji: <:{emj.name}:{emj.id}>')
                             await ses.close()
+                            print("\n\n\n\n\n\nadded emote")
                         else:
                             await ctx.send(f'Error when making request | {r.status} response.')
                             await ses.close()
                             
                     except discord.HTTPException as e:
                         await ctx.send('File size is too big!')
-            await send_view(self,ctx,emoji,page)
+            await send_view(self,ctx,emoji,name,url,page)
 
     if view.value == "3":
         if msg: await msg.delete()
@@ -101,15 +101,16 @@ async def send_view(self,ctx,emoji,page=0):
         if msg: await msg.delete()
         if(page==len(emoji)-1):
             await ctx.reply("Cannot go ahead!")
-            await send_view(self,ctx,emoji,page)
+            await send_view(self,ctx,emoji,name,url,page)
         else:
             page+=1 
-            await send_view(self,ctx,emoji,page)
+            await send_view(self,ctx,emoji,name,url,page)
 
 async def get_name_url(emoji):
     name  = []
     url = []
     for emote in emoji:
+        print(emoji,emote)
         if emote[1]=='a':
             index = emote.find(":",5)
             name.append(emote[3:index])
