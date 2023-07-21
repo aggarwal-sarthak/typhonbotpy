@@ -55,9 +55,7 @@ async def on_command_error(ctx, error):
         now = datetime.now()
         now = datetime.timestamp(now)
         reply = await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown! Try again <t:{int(now+error.retry_after)}:R> !")
-        print("\n\n\n\n\ngoing to sleep")
         time.sleep(error.retry_after)
-        print("\n\n\n\n\nfrom sleep")
         await reply.delete()
 
     if isinstance(error, commands.MissingPermissions):
