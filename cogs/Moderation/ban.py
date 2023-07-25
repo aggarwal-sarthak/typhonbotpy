@@ -17,11 +17,8 @@ class ban(commands.Cog):
 
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
-    @commands.command()
-    async def ban(self,ctx,user: discord.Member = None):
-        if(not user): 
-            await ctx.reply("No Member Mentioned!")
-            return
+    @commands.command(description="Bans Member from the Server",aliases=None,usage=f"{os.path.basename(__file__)[:-3]} <user> []")
+    async def ban(self,ctx,user: discord.Member):
         view = Buttons(ctx)
         msg = await ctx.reply(f"You are about to ban: {user}",view=view)
         await view.wait()
