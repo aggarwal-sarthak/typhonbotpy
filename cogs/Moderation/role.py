@@ -76,8 +76,10 @@ async def parse_ids(ids):
 async def position_check(self, ctx, role):
     if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
         await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Assign The Role `{role.name}`!")
+        raise commands.CommandError("Command Cancelled")
     elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
         await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Assign The Role `{role.name}`!")
+        raise commands.CommandError("Command Cancelled")
         
 async def give_role(self, ctx, role_list, member_list, role_string, member_string):
     await ctx.message.add_reaction(self.client.emotes['success'])
