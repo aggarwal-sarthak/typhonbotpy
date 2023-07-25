@@ -19,35 +19,9 @@ client = commands.Bot(command_prefix=config['prefix'], intents=intents, help_com
 client.config = config
 client.emotes = emotes
 
-@client.command()
-async def load(ctx,extension):
-    await client.load_extension(f'cogs.{extension}')
-    await ctx.reply(f"{client.emotes['success']} | Command {extension} Loaded Successfully!")
-
-@client.command()
-async def unload(ctx,extension):
-    await client.unload_extension(f'cogs.{extension}')
-    await ctx.reply(f"{client.emotes['success']} | Command {extension} Unloaded Successfully!")
-
-@client.command()
-async def reload(ctx,extension):
-    await client.reload_extension(f'cogs.{extension}')
-    await ctx.reply(f"{client.emotes['success']} | Command {extension} Reloaded Successfully!")
-
 @client.event
 async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
-
-async def load():
-    for folder in os.listdir("./cogs"):
-        for filename in os.listdir(f'./cogs/{folder}'):
-            if filename.endswith(".py"):
-                await client.load_extension(f"cogs.{folder}.{filename[:-3]}")
-
-async def main():
-    async with client:
-        await load()
-        await client.start(config['token'])
 
 @client.event
 async def on_command_error(ctx, error):
@@ -61,9 +35,64 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
         await ctx.reply(f"{client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
+
     if isinstance(error, commands.BotMissingPermissions):
         err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
         await ctx.reply(f"{client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
+
+@client.event
+async def on_guild_join(guild):
+    members_count = sum(1 for _ in guild.members)
+
+    invite_link = None
+    if guild.me.guild_permissions.create_instant_invite:
+        invite = await guild.text_channels[0].create_invite()
+        invite_link = invite.url
+
+    icon_url = guild.icon_url_as(format="png") if guild.icon else None
+
+    embed = discord.Embed(title="JOINED A SERVER", color=0xfb7c04)
+    embed.add_field(name="SERVER NAME:", value=guild.name, inline=False)
+    embed.add_field(name="SERVER ID:", value=guild.id, inline=False)
+    embed.add_field(name="SERVER MEMBERS: ", value=members_count, inline=False)
+    if invite_link: embed.add_field(name="INVITE LINK:", value=invite_link, inline=False)
+    if icon_url: embed.set_thumbnail(url=icon_url)
+
+    client_total_servers = len(client.guilds)
+    client_total_members = sum(len(guild.members) for guild in client.guilds)
+    embed.set_footer(text=f"BOT SERVERS: {client_total_servers} | BOT MEMBERS: {client_total_members}")
+
+    target_channel = client.get_channel(client.config["join_logs"])
+    if target_channel: await target_channel.send(embed=embed)
+
+@client.event
+async def on_guild_remove(guild):
+    members_count = sum(1 for _ in guild.members)
+    icon_url = guild.icon_url_as(format="png") if guild.icon else None
+
+    embed = discord.Embed(title="LEFT A SERVER", color=0xfb7c04)
+    embed.add_field(name="SERVER NAME:", value=guild.name, inline=False)
+    embed.add_field(name="SERVER ID:", value=guild.id, inline=False)
+    embed.add_field(name="SERVER MEMBERS: ", value=members_count, inline=False)
+    if icon_url: embed.set_thumbnail(url=icon_url)
+
+    client_total_servers = len(client.guilds)
+    client_total_members = sum(len(guild.members) for guild in client.guilds)
+    embed.set_footer(text=f"BOT SERVERS: {client_total_servers} | BOT MEMBERS: {client_total_members}")
+
+    target_channel = client.get_channel(client.config["leave_logs"])
+    if target_channel: await target_channel.send(embed=embed)
+
+async def load():
+    for folder in os.listdir("./cogs"):
+        for filename in os.listdir(f'./cogs/{folder}'):
+            if filename.endswith(".py"):
+                await client.load_extension(f"cogs.{folder}.{filename[:-3]}")
+
+async def main():
+    async with client:
+        await load()
+        await client.start(config['token'])
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 asyncio.run(main()) 

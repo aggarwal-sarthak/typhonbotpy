@@ -17,7 +17,7 @@ class ban(commands.Cog):
 
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
-    @commands.command()
+    @commands.command(description='Ban The Mentioned Member From The Server', aliases=['forceban'], usage=f"{os.path.basename(__file__)[:-3]} <member>")
     async def ban(self,ctx,user: discord.Member = None):
         if(not user): 
             await ctx.reply("No Member Mentioned!")
