@@ -9,7 +9,7 @@ class e(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.command(description='Evaluates given code',aliases=['eval'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Evaluates given code',aliases=['eval', 'e'], usage=f"{os.path.basename(__file__)[:-3]}")
     async def e(self, ctx, *,code: str):
         if ctx.author.id not in self.client.config["owner"]: return
         try:
