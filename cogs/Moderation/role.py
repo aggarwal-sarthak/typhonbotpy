@@ -1,6 +1,7 @@
 from discord.ext import commands
+import discord
 import os
-
+import confirmation
 class role(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -13,6 +14,9 @@ class role(commands.Cog):
     @commands.bot_has_permissions(manage_roles=True)
     @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
     async def role(self, ctx, mode=None, *ids):
+        if(mode.lower() not in ['add','remove']):
+            return
+        mode = mode.lower()
         ids = await parse_ids(ids)
         if(len(ids)==0):
             await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
@@ -48,17 +52,57 @@ class role(commands.Cog):
 
                 if member:
                     member_list.append(id)
-    
+        for r in role_list:
+            role = ctx.guild.get_role(int(r))
+            if(mode=="remove"):
+                member_list = [str(mem.id) for mem in role.members if str(mem.id) in member_list]
+            else:
+                member_list = set(member_list) - set([str(mem.id) for mem in role.members])
         if(len(member_list)==0 or len(role_list)==0):
             await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
+            return
         else:
-            match mode:
-                case 'add':
-                    await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
-                case 'remove':
-                    await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list, role_string=role_string, member_string=member_string)
-                case _:
-                    await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
+            if(len(role_list)<=10):            
+                for r in role_list: role_string += "<@&" + str(ctx.guild.get_role(int(r)).id) + ">,"
+            else:
+                role_string = "`"+str(len(role_list)) + " roles``"
+            if(len(member_list)<=10):
+                for m in member_list: member_string += "<@"+str(ctx.guild.get_member(int(m)).id) + ">,"
+            else:
+                member_string = "`"+str(len(member_list)) + " members``"
+            view = confirmation.Buttons(ctx)
+            embed = discord.Embed(title=f"{mode.capitalize()}?",description=f"**Roles: {role_string[:-1]}\nMembers: {member_string[:-1]}**",color=0xfb7c04)
+            msg = await ctx.reply(embed=embed,view=view)
+            await view.wait()
+            if view.value == "1":
+                if msg: await msg.delete()
+                await ctx.message.add_reaction(self.client.emotes['success'])
+                role_string = ""
+                member_string = ""
+                if(len(role_list)<=10):            
+                    for r in role_list: role_string += "`" + str(ctx.guild.get_role(int(r)).name) + "`,"
+                else:
+                    role_string = "`"+str(len(role_list)) + " roles``"
+                if(len(member_list)<=10):
+                    for m in member_list: member_string += "`"+str(ctx.guild.get_member(int(m)).name) + "`,"
+                else:
+                    member_string = "`"+str(len(member_list)) + " members``"
+
+
+                match mode:
+                    case 'add':
+                        await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
+                    case 'remove':
+                        await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
+                    case _:
+                        await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
+            if view.value == "2":
+                if msg: await msg.delete()
+                await ctx.message.add_reaction(self.client.emotes['failed'])
+                raise commands.CommandError("Command Cancelled")     
+           
+
+            
 
 async def parse_ids(ids):
     parsed_ids = []
@@ -82,39 +126,20 @@ async def position_check(self, ctx, role):
         raise commands.CommandError("Command Cancelled")
         
 async def give_role(self, ctx, role_list, member_list, role_string, member_string):
-    await ctx.message.add_reaction(self.client.emotes['success'])
     for r in role_list:
         role = ctx.guild.get_role(int(r))
-        member_list = set(member_list) - set([str(mem.id) for mem in role.members])
         for m in list(member_list):
             await ctx.guild.get_member(int(m)).add_roles(role)
-    if(len(role_list)<=10):            
-        for r in role_list: role_string += "`" + ctx.guild.get_role(int(r)).name + "`,"
-    else:
-        role_string = "`"+str(len(role_list)) + " roles``"
-    if(len(member_list)<=10):
-        for m in member_list: member_string += "`" + ctx.guild.get_member(int(m)).name + "`,"
-    else:
-        member_string = "`"+str(len(member_list)) + " members``"
-
     await ctx.reply(f"{self.client.emotes['success']} | Added {role_string[:-1]} To {member_string[:-1]}!")
+    
+            
+
 
 async def take_role(self, ctx, role_list, member_list, role_string, member_string):
-    await ctx.message.add_reaction(self.client.emotes['success'])
     for r in role_list:
         role = ctx.guild.get_role(int(r))
-        member_list = [str(mem.id) for mem in role.members if str(mem.id) in member_list]
         for m in member_list:
             await ctx.guild.get_member(int(m)).remove_roles(ctx.guild.get_role(int(r)))
-    if(len(role_list)<=10):            
-        for r in role_list: role_string += "`" + ctx.guild.get_role(int(r)).name + "`,"
-    else:
-        role_string = "`"+str(len(role_list)) + " roles``"
-    if(len(member_list)<=10):
-        for m in member_list: member_string += "`" + ctx.guild.get_member(int(m)).name + "`,"
-    else:
-        member_string = "`"+str(len(member_list)) + " members``"
-
     await ctx.reply(f"{self.client.emotes['success']} | Removed {role_string[:-1]} From {member_string[:-1]}!")
 
 async def setup(client):
