@@ -6,7 +6,6 @@ import confirmation
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
 
-
 class ban(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -30,15 +29,6 @@ class ban(commands.Cog):
             if msg: await msg.delete()
             await ctx.reply(f"{self.client.emotes['success']} | Ban Cancelled Successfully!")
             return False
-
-
-
-
-
-
-
-
-
 
 async def setup(client):
     await client.add_cog(ban(client)) 

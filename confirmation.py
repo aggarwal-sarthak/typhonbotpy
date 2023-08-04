@@ -3,7 +3,6 @@ import json
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
 
-
 class Buttons(discord.ui.View):
     def __init__ (self, ctx, *, timeout=60):
         super().__init__(timeout=timeout)

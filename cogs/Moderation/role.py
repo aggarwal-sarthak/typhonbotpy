@@ -88,7 +88,6 @@ class role(commands.Cog):
                 else:
                     member_string = "`"+str(len(member_list)) + " members``"
 
-
                 match mode:
                     case 'add':
                         await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
@@ -101,9 +100,6 @@ class role(commands.Cog):
                 await ctx.message.add_reaction(self.client.emotes['failed'])
                 raise commands.CommandError("Command Cancelled")     
            
-
-            
-
 async def parse_ids(ids):
     parsed_ids = []
     for id in ids:
@@ -132,9 +128,6 @@ async def give_role(self, ctx, role_list, member_list, role_string, member_strin
             await ctx.guild.get_member(int(m)).add_roles(role)
     await ctx.reply(f"{self.client.emotes['success']} | Added {role_string[:-1]} To {member_string[:-1]}!")
     
-            
-
-
 async def take_role(self, ctx, role_list, member_list, role_string, member_string):
     for r in role_list:
         role = ctx.guild.get_role(int(r))

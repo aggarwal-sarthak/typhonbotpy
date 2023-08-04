@@ -14,6 +14,7 @@ with open('emoji.json', 'r') as f:
 
 intents = discord.Intents.all()
 intents.presences = False
+intents.voice_states = True
 
 client = commands.Bot(command_prefix=config['prefix'], intents=intents, help_command=None, case_insensitive=True,)
 client.config = config
