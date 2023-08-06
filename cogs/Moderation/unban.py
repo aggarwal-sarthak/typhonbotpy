@@ -20,8 +20,9 @@ class unban(commands.Cog):
     async def unban(self,ctx,user:int,*reason: str):
         banned = [entry.user.id async for entry in ctx.guild.bans()]
         print(banned)
-        if(user in banned):
-            print("he is banned fosho fosho\n\n\n\n")
+        for bans in banned:
+            if(user==bans):
+                pass
         if(len(reason)!=0):
             reason = " ".join([x for x in reason])
         else:
