@@ -19,8 +19,8 @@ class voicemove(commands.Cog):
     async def move(self, old, new, oldmem):
         for member in oldmem:
             await member.move_to(new)
-        voice_client = discord.utils.get(self.client.voice_clients, guild=old.guild)
-        await voice_client.disconnect()
+        # voice_client = discord.utils.get(self.client.voice_clients, guild=old.guild)
+        # await voice_client.disconnect()
 
     @commands.has_guild_permissions(move_members=True)
     @commands.bot_has_guild_permissions(move_members=True)
@@ -35,7 +35,7 @@ class voicemove(commands.Cog):
             for i in mem:
                 await i.move_to(id[0])
         
-        else:
+        if not id:
             print("run")
             channel = ctx.author.voice.channel
             try:
