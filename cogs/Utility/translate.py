@@ -13,8 +13,6 @@ class translate(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.has_permissions(kick_members=True)
-    @commands.bot_has_permissions(kick_members=True)
     @commands.command(description="Translates A Messages In Given Language",usage=f"{os.path.basename(__file__)[:-3]} <Language> <Text>")
     async def translate(self, ctx, lang:str, *text:str):
         text = " ".join([x for x in text])
