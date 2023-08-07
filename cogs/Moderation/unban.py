@@ -19,21 +19,21 @@ class unban(commands.Cog):
     @commands.command(description="Unbans Banned Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
     async def unban(self,ctx,user:int,*reason: str):
         banned = [entry.user.id async for entry in ctx.guild.bans()]
-        print(banned)
-        for bans in banned:
-            if(user==bans):
-                pass
+        if user not in banned:
+            await ctx.reply(f"{self.client.emotes['failed']} | {user} was not found in Ban list!")
+            return
         if(len(reason)!=0):
             reason = " ".join([x for x in reason])
         else:
             reason=None
         view = confirmation.Buttons(ctx)
-        msg = await ctx.reply(f"You are about to unban: {user}",view=view)
+        user = await self.client.fetch_user(user)
+        msg = await ctx.reply(f"You are about to unban: <@{user.id}>",view=view)
         await view.wait()
         if view.value == "1":
             if msg: await msg.delete()
             await ctx.guild.unban(user=user,reason=reason)
-            await ctx.reply(f"{self.client.emotes['success']} | {user} was unbanned successfully!")
+            await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> was unbanned successfully!")
             return False
         if view.value == "2":
             if msg: await msg.delete()
