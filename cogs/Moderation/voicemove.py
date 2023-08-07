@@ -50,26 +50,7 @@ class voicemove(commands.Cog):
                 voice_client = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
                 await voice_client.disconnect()
             except Exception as e:
-                print("\n\n\n\n\n\n",e)
                 await ctx.reply(f"{self.client.emotes['failed']} | Error Connecting To Voice Channel!")
             
-            if id:
-                mem = ctx.author.voice.channel.members
-                for i in mem:
-                    await i.move_to(id[0])
-            
-            if len(id)==0:
-                print("run")
-                channel = ctx.author.voice.channel
-                try:
-                    vc = await channel.connect()
-                    await ctx.reply(f"{self.client.emotes['success']} | Move Me To New Channel To Start Voicemove!")
-                except discord.ClientException:
-                    await ctx.reply(f"{self.client.emotes['failed']} | I'm Already Connect To A Voice Channel!")
-                except Exception as e:
-                    print("\n\n\n\n\n\n",e)
-                    await ctx.reply(f"{self.client.emotes['failed']} | Error Connecting To Voice Channel!")
-        except Exception as e:
-            print("\n\n\n\n\n\n",e)        
 async def setup(client):
     await client.add_cog(voicemove(client))
