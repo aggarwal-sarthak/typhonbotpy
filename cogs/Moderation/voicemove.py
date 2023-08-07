@@ -42,7 +42,7 @@ class voicemove(commands.Cog):
                 await channel.connect()
                 await ctx.reply(f"{self.client.emotes['success']} | Move Me To New Channel To Start Voicemove!")
 
-                await self.client.wait_for('on_voice_state_update', timeout=30)
+                await self.client.wait_for('voice_state_update', timeout=30)
             except discord.ClientException:
                 await ctx.reply(f"{self.client.emotes['failed']} | I'm Already Connect To A Voice Channel!")
             except asyncio.TimeoutError:
