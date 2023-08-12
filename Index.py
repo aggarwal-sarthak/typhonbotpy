@@ -6,23 +6,47 @@ import json
 import logging
 import sys
 from datetime import datetime
+from pymongo import MongoClient
 import time 
 with open('config.json', 'r') as f:
     config = json.load(f)
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
 
+
+try:
+    uri = "mongodb+srv://TyphonBotDB:sarthak13@typhonbotcluster.dxwct.mongodb.net/?retryWrites=true&w=majority"
+    # Create a new client and connect to the server
+    db_client = MongoClient(uri)
+    # Send a ping to confirm a successful connection
+
+    db_client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
 intents = discord.Intents.all()
 intents.presences = False
 intents.voice_states = True
 
-client = commands.Bot(command_prefix=config['prefix'], intents=intents, help_command=None, case_insensitive=True,)
+def get_prefix(client,ctx):
+    guild_info = db_client.typhonbot.guilds.find_one({"guild_id":ctx.guild.id})
+    if(guild_info['prefix']==""):
+        return config['prefix']
+    else:
+        return guild_info['prefix']
+    
+
+client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None, case_insensitive=True,)
 client.config = config
 client.emotes = emotes
+client.db = db_client.typhonbot
 
 @client.event
 async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
+
+
 
 @client.event
 async def on_command_error(ctx, error):
@@ -43,6 +67,14 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_guild_join(guild):
+    client.db.guilds.insert_one({
+        "guild_id":guild.id,
+        "prefix":"",
+        "cmds":[],
+
+    })
+
+
     members_count = sum(1 for _ in guild.members)
 
     invite_link = None
@@ -50,7 +82,7 @@ async def on_guild_join(guild):
         invite = await guild.text_channels[0].create_invite()
         invite_link = invite.url
 
-    icon_url = guild.icon_url_as(format="png") if guild.icon else None
+    icon_url = guild.icon.replace(format="png") if guild.icon else None
 
     embed = discord.Embed(title="JOINED A SERVER", color=0xfb7c04)
     embed.add_field(name="SERVER NAME:", value=guild.name, inline=False)
@@ -68,8 +100,10 @@ async def on_guild_join(guild):
 
 @client.event
 async def on_guild_remove(guild):
+    client.db.guilds.delete_one({"guild_id":guild.id})
+
     members_count = sum(1 for _ in guild.members)
-    icon_url = guild.icon_url_as(format="png") if guild.icon else None
+    icon_url = guild.icon.replace(format="png") if guild.icon else None
 
     embed = discord.Embed(title="LEFT A SERVER", color=0xfb7c04)
     embed.add_field(name="SERVER NAME:", value=guild.name, inline=False)

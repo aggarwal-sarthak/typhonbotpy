@@ -5,6 +5,7 @@ from googletrans import Translator
 translator = Translator()
 
 
+
 class translate(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -12,7 +13,7 @@ class translate(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
+        
     @commands.command(description="Translates A Messages In Given Language",usage=f"{os.path.basename(__file__)[:-3]} <Language> <Text>")
     async def translate(self, ctx, lang:str, *text:str):
         text = " ".join([x for x in text])
