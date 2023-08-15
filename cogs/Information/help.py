@@ -25,10 +25,16 @@ class help(commands.Cog):
             menu.add_field(name="Usage", value=f'`{usage}`')
             await ctx.reply(embed=menu)
         else:
+            res = self.client.db.guilds.find_one({"guild_id": ctx.guild.id})
+            print(res)
+            if res and "prefix" in res:
+                prefix = res['prefix']
+            else:
+                prefix = self.client.config['prefix']
             embed = discord.Embed(title="TYPHON BOT Commands",color=0xfb7c04)
-            embed.add_field(name="",value=f"{self.client.emotes['success']} : Prefix For This Server : `{self.client.config['prefix']}`\n\
+            embed.add_field(name="",value=f"{self.client.emotes['success']} : Prefix For This Server : `{prefix}`\n\
                             {self.client.emotes['success']} : Total Bot Commands : `{len(self.client.commands)}`\n\
-                            {self.client.emotes['success']} : Type {self.client.config['prefix']}help <command> For More Info\n\
+                            {self.client.emotes['success']} : Type {prefix}help <command> For More Info\n\
                             [Invite Typhon Bot](https://discord.com/api/oauth2/authorize?client_id=756052319417925633&permissions=2113268958&redirect_uri=https%3A%2F%2Fdiscord.com%2Finvite%2F5UqVvZj&response_type=code&scope=bot%20guilds.join%20applications.commands)\
                              | [Support Server](https://discord.com/invite/5UqVvZj)\
                              | [Vote For Typhon Bot](https://top.gg/bot/756052319417925633/vote)",inline=False)

@@ -19,11 +19,7 @@ class announce(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(description="Embed Builder",aliases=['embed','ann'],usage=f"{os.path.basename(__file__)[:-3]} <Channel>")
     @commands.cooldown(1, 60, commands.BucketType.user)
-    async def announce(self, ctx, channel: discord.TextChannel=None):
-        if channel is None:
-            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
-            return
-
+    async def announce(self, ctx, channel: discord.TextChannel):
         embed_dict = dict()
         embed_dict['title'] = await get_title(self,ctx)
         embed_dict['description'] = await get_description(self,ctx)

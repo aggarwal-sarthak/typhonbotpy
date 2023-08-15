@@ -16,8 +16,6 @@ class roleinfo(commands.Cog):
     @commands.command(description='Returns Information About Mentioned Role', usage=f"{os.path.basename(__file__)[:-3]} <role>")
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def roleinfo(self, ctx, role: discord.Role=None):
-        if not role:
-            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
         permissions = ", ".join(sorted([str(perms[0]).replace("_"," ").title() for perms in role.permissions if perms[1] is True]))
         if not permissions: permissions = "None"
         embed = discord.Embed(title=None,color=0xfb7c04)

@@ -19,8 +19,7 @@ class role(commands.Cog):
         mode = mode.lower()
         ids = await parse_ids(ids)
         if(len(ids)==0):
-            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
-            return
+            raise commands.CommandError("MissingRequiredArgument")
         member_list=[]
         role_list=[]
         member_string=""
@@ -59,8 +58,7 @@ class role(commands.Cog):
             else:
                 member_list = set(member_list) - set([str(mem.id) for mem in role.members])
         if(len(member_list)==0 or len(role_list)==0):
-            await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
-            return
+            raise commands.CommandError("MissingRequiredArgument")
         else:
             if(len(role_list)<=10):            
                 for r in role_list: role_string += "<@&" + str(ctx.guild.get_role(int(r)).id) + ">,"
@@ -94,7 +92,7 @@ class role(commands.Cog):
                     case 'remove':
                         await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
                     case _:
-                        await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
+                        raise commands.CommandError("MissingRequiredArgument")
             if view.value == "2":
                 if msg: await msg.delete()
                 await ctx.message.add_reaction(self.client.emotes['failed'])

@@ -13,15 +13,12 @@ with open('config.json', 'r') as f:
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
 
-
 try:
     uri = "mongodb+srv://TyphonBotDB:sarthak13@typhonbotcluster.dxwct.mongodb.net/?retryWrites=true&w=majority"
-    # Create a new client and connect to the server
     db_client = MongoClient(uri)
-    # Send a ping to confirm a successful connection
 
     db_client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
+    print("✅ | Successfully Connected to MongoDB!")
 except Exception as e:
     print(e)
 
@@ -29,13 +26,12 @@ intents = discord.Intents.all()
 intents.presences = False
 intents.voice_states = True
 
-def get_prefix(client,ctx):
+def get_prefix(client, ctx):
     guild_info = db_client.typhonbot.guilds.find_one({"guild_id":ctx.guild.id})
-    if(guild_info['prefix']==""):
-        return config['prefix']
-    else:
+    if(guild_info and guild_info['prefix']):
         return guild_info['prefix']
-    
+    else:
+        return config['prefix']
 
 client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None, case_insensitive=True,)
 client.config = config
@@ -46,10 +42,12 @@ client.db = db_client.typhonbot
 async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
 
-
-
 @client.event
 async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.invoke(client.get_command('help'), ctx.command.name)
     if isinstance(error, commands.CommandOnCooldown):
         now = datetime.now()
         now = datetime.timestamp(now)
@@ -71,9 +69,7 @@ async def on_guild_join(guild):
         "guild_id":guild.id,
         "prefix":"",
         "cmds":[],
-
     })
-
 
     members_count = sum(1 for _ in guild.members)
 

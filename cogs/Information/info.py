@@ -22,10 +22,7 @@ class info(commands.Cog):
         embedVar.add_field(name="Discord.py",value=discord.__version__,inline=False)
         embedVar.add_field(name="Owner",value=f"[{await self.client.fetch_user(self.client.config['owner'][0])}](https://discord.com/users/{self.client.config['owner'][0]})[<@!{self.client.config['owner'][0]}>]\n[{await self.client.fetch_user(self.client.config['owner'][1])}](https://discord.com/users/{self.client.config['owner'][1]})[<@!{self.client.config['owner'][1]}>]",inline=False)
         embedVar.add_field(name="Total Servers",value=len(self.client.guilds))
-        # users = 0
-        # for guild in self.client.guilds:
-        #     users += guild.members
-        # embedVar.add_field(name="Total Users",value=sum(guild.member_count for guild in self.client.guilds),inline=False)
+        embedVar.add_field(name="Total Users",value=sum(len(guild.members) for guild in self.client.guilds),inline=False)
         td = datetime.datetime.now() - start_time
         days = td.days
         hours, remainder = divmod(td.seconds, 3600)

@@ -68,7 +68,7 @@ class list(commands.Cog):
                 await mention_pagination(self,ctx,data,embeds, title)
 
             case _:
-                await ctx.invoke(self.client.get_command('help'), f"{os.path.basename(__file__)[:-3]}")
+                raise commands.CommandError("MissingRequiredArgument")
 
 async def mention_pagination(self, ctx, data, embeds, title):
     for i in range(0,len(data), 20):
