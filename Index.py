@@ -65,11 +65,11 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_guild_join(guild):
-    client.db.guilds.insert_one({
-        "guild_id":guild.id,
-        "prefix":"",
-        "cmds":[],
-    })
+    # client.db.guilds.insert_one({
+    #     "guild_id":guild.id,
+    #     "prefix":"",
+    #     "cmds":[],
+    # })
 
     members_count = sum(1 for _ in guild.members)
 
