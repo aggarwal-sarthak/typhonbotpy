@@ -28,7 +28,8 @@ intents.voice_states = True
 
 def get_prefix(client, ctx):
     guild_info = db_client.typhonbot.guilds.find_one({"guild_id":ctx.guild.id})
-    if(guild_info and guild_info['prefix']):
+    # print("\n\n\n\n", guild_info['guild_id'])
+    if(guild_info and 'prefix' in guild_info):
         return guild_info['prefix']
     else:
         return config['prefix']
