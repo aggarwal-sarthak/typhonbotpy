@@ -13,13 +13,14 @@ class role(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
-    async def role(self, ctx, mode=None, *ids):
+    async def role(self, ctx, mode, *ids):
+        if(len(ids)==0):
+            await ctx.invoke(self.client.get_command('help'), ctx.command.name)
+            return
         if(mode.lower() not in ['add','remove']):
             return
         mode = mode.lower()
         ids = await parse_ids(ids)
-        if(len(ids)==0):
-            raise commands.CommandError("MissingRequiredArgument")
         member_list=[]
         role_list=[]
         member_string=""
@@ -92,7 +93,7 @@ class role(commands.Cog):
                     case 'remove':
                         await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
                     case _:
-                        raise commands.CommandError("MissingRequiredArgument")
+                        ctx.reply(f'{self.client.emotes["failed"]} Not a valid argument!')
             if view.value == "2":
                 if msg: await msg.delete()
                 await ctx.message.add_reaction(self.client.emotes['failed'])
