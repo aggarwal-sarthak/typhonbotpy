@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import os
 import confirmation
+from types import SimpleNamespace
 class role(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -15,8 +16,7 @@ class role(commands.Cog):
     @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
     async def role(self, ctx, mode, *ids):
         if(len(ids)==0):
-            await ctx.invoke(self.client.get_command('help'), ctx.command.name)
-            return
+            raise commands.MissingRequiredArgument(SimpleNamespace(name="IDs"))
         if(mode.lower() not in ['add','remove']):
             return
         mode = mode.lower()

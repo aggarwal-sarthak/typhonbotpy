@@ -45,6 +45,10 @@ async def on_ready():
 
 @client.event
 async def on_command_error(ctx, error):
+    print("\n\n\n\n\n\n",vars(error))
+    if isinstance(error,commands.CommandInvokeError):
+        if isinstance(error.original,asyncio.TimeoutError):
+            await ctx.reply(f"{client.emotes['failed']} | Command Timed Out!")
     if isinstance(error, commands.CommandNotFound):
         return
     if isinstance(error, commands.MissingRequiredArgument):
@@ -55,7 +59,6 @@ async def on_command_error(ctx, error):
         reply = await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown! Try again <t:{int(now+error.retry_after)}:R> !")
         await asyncio.sleep(error.retry_after)
         await reply.delete()
-
     if isinstance(error, commands.MissingPermissions):
         err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
         await ctx.reply(f"{client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
