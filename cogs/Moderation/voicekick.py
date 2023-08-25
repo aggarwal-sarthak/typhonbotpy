@@ -13,7 +13,7 @@ class voicekick(commands.Cog):
     @commands.has_guild_permissions(move_members=True)
     @commands.bot_has_guild_permissions(move_members=True)
     @commands.command(description='Voicekick A User From Voice Channel',aliases = ['vk', 'vkick'], usage=f"{os.path.basename(__file__)[:-3]} <user>")
-    async def voicekick(self, ctx, member: discord.Member=None):
+    async def voicekick(self, ctx, member: discord.Member):
         vcstate = member.voice
         if not vcstate or not vcstate.channel:
             return await ctx.reply(f"{self.client.emotes['failed']} | `{member}` Is Not In Any Voice Channel!")

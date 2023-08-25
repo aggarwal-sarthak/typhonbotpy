@@ -8,7 +8,7 @@ class setprefix(commands.Cog):
     @commands.has_permissions(administrator=True)
     @commands.command(description= "Sets The Mentioned Symbol As Server Prefix", aliases=['set','sp','setpre'], usage=f"{os.path.basename(__file__)[:-3]} <Symbol>" )
     @commands.cooldown(1, 10, commands.BucketType.guild)
-    async def setprefix(self, ctx, symbol:str=None):
+    async def setprefix(self, ctx, symbol:str):
         guild_db = self.client.db.guilds.find_one({"guild_id":ctx.guild.id})
         
         if(len(symbol)>4):
