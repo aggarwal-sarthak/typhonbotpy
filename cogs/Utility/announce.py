@@ -101,10 +101,13 @@ async def get_color(self,ctx):
         return color
 
 async def get_thumbnail(self,ctx,user_embed):
-    bot_embed = discord.Embed(title='Embed Builder : Thumbnail',description="Enter The Thumbnail Of The Announcement\n[Note] : The Thumbnail Must Be In Link Format\n\n[None] : Type None For No Thumbnail\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
+    bot_embed = discord.Embed(title='Embed Builder : Thumbnail',description="Enter The Thumbnail Of The Announcement\n[Note] : Must Be an Attachment or In Link Format\n\n[None] : Type None For No Thumbnail\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     thumbnail = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
-    if(thumbnail.content.lower()=="cancel"):
+    if(len(thumbnail.attachments)!=0):
+        user_embed.set_thumbnail(url=thumbnail.attachments[0].proxy_url)
+
+    elif(thumbnail.content.lower()=="cancel"):
         await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
         raise commands.CommandError("Command Cancelled")
     else:
@@ -126,10 +129,13 @@ async def verif_url(url):
     return False
 
 async def get_image(self,ctx,user_embed):
-    bot_embed = discord.Embed(title='Embed Builder : Image',description="Enter The Image Of The Announcement\n[Note] : The Image Must Be In Link Format\n\n[None] : Type None For No Image\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
+    bot_embed = discord.Embed(title='Embed Builder : Image',description="Enter The Image Of The Announcement\n[Note] : Must Be an Attachment or In Link Format\n\n[None] : Type None For No Image\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     image = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
-    if(image.content.lower()=="cancel"):
+    if(len(image.attachments)!=0):
+        user_embed.set_image(url=image.attachments[0].proxy_url)
+    
+    elif(image.content.lower()=="cancel"):
         await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
         raise commands.CommandError("Command Cancelled")
     else:
