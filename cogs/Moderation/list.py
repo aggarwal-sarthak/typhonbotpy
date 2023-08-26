@@ -2,6 +2,7 @@ from discord.ext import commands
 import os
 import discord
 import pagination
+from types import SimpleNamespace
 
 class list(commands.Cog):
     def __init__(self, client):
@@ -68,7 +69,7 @@ class list(commands.Cog):
                 await mention_pagination(self,ctx,data,embeds, title)
 
             case _:
-                raise commands.CommandError("MissingRequiredArgument")
+                raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name="mode"))
 
 async def mention_pagination(self, ctx, data, embeds, title):
     for i in range(0,len(data), 20):

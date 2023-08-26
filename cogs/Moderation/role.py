@@ -3,6 +3,7 @@ import discord
 import os
 import confirmation
 from types import SimpleNamespace
+
 class role(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -16,9 +17,9 @@ class role(commands.Cog):
     @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
     async def role(self, ctx, mode, *ids):
         if(len(ids)==0):
-            raise commands.MissingRequiredArgument(SimpleNamespace(name="IDs"))
+            raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name="IDs"))
         if(mode.lower() not in ['add','remove']):
-            return
+            raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name ="mode"))
         mode = mode.lower()
         ids = await parse_ids(ids)
         member_list=[]
@@ -59,7 +60,7 @@ class role(commands.Cog):
             else:
                 member_list = set(member_list) - set([str(mem.id) for mem in role.members])
         if(len(member_list)==0 or len(role_list)==0):
-            raise commands.CommandError("MissingRequiredArgument")
+            raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name="list"))
         else:
             if(len(role_list)<=10):            
                 for r in role_list: role_string += "<@&" + str(ctx.guild.get_role(int(r)).id) + ">,"
@@ -103,12 +104,12 @@ async def parse_ids(ids):
     parsed_ids = []
     for id in ids:
         if "<@&" in id:
-            parsed_ids.append(id[3:-1])
+            parsed_ids.append(id[id.index("<@&")+3:id.index(">")])
 
         elif "<@" in id:
-            parsed_ids.append(id[2:-1])
+            parsed_ids.append(id[id.index("<@")+2:id.index(">")])
         
-        else:
+        elif id.isdigit():
             parsed_ids.append(id)
     return parsed_ids
 

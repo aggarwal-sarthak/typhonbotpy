@@ -28,7 +28,6 @@ intents.voice_states = True
 
 def get_prefix(client, ctx):
     guild_info = db_client.typhonbot.guilds.find_one({"guild_id":ctx.guild.id})
-    # print("\n\n\n\n", guild_info['guild_id'])
     if(guild_info and 'prefix' in guild_info):
         return guild_info['prefix']
     else:
@@ -45,13 +44,12 @@ async def on_ready():
 
 @client.event
 async def on_command_error(ctx, error):
-    print("\n\n\n\n\n\n",vars(error))
     if isinstance(error,commands.CommandInvokeError):
         if isinstance(error.original,asyncio.TimeoutError):
             await ctx.reply(f"{client.emotes['failed']} | Command Timed Out!")
     if isinstance(error, commands.CommandNotFound):
         return
-    if isinstance(error, commands.MissingRequiredArgument):
+    if isinstance(error, commands.MissingRequiredArgument or commands.MissingArgument):
         await ctx.invoke(client.get_command('help'), ctx.command.name)
     if isinstance(error, commands.CommandOnCooldown):
         now = datetime.now()
@@ -69,12 +67,6 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_guild_join(guild):
-    # client.db.guilds.insert_one({
-    #     "guild_id":guild.id,
-    #     "prefix":"",
-    #     "cmds":[],
-    # })
-
     members_count = sum(1 for _ in guild.members)
 
     invite_link = None
