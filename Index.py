@@ -7,7 +7,6 @@ import logging
 import sys
 from datetime import datetime
 from pymongo import MongoClient
-import time 
 with open('config.json', 'r') as f:
     config = json.load(f)
 with open('emoji.json', 'r') as f:
@@ -21,6 +20,9 @@ try:
     print("✅ | Successfully Connected to MongoDB!")
 except Exception as e:
     print(e)
+
+
+
 
 intents = discord.Intents.all()
 intents.presences = False
@@ -37,6 +39,11 @@ client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=N
 client.config = config
 client.emotes = emotes
 client.db = db_client.typhonbot
+
+
+
+        
+
 
 @client.event
 async def on_ready():
