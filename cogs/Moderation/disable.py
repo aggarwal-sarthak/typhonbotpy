@@ -1,16 +1,11 @@
-import discord
+import os
 from discord.ext import commands
-import os 
 
 class disable(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-
-    @commands.command(name = "disable",
-                    usage=f"{os.path.basename(__file__)[:-3]} <command>",
-                    description = "Disables The Mentioned Command",
-                    aliases=["dis"])
+    @commands.command(usage=f"{os.path.basename(__file__)[:-3]} <command>", description = "Disables The Mentioned Command", aliases=["dis"])
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 2, commands.BucketType.member)
     async def disable(self, ctx:commands.Context, cmnd: str):
@@ -38,7 +33,6 @@ class disable(commands.Cog):
             self.client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"cmds":cmds}})
             await ctx.reply(f"{self.client.emotes['success']} | Command Disabled!")
                 
-            
             
 async def setup(client):
     await client.add_cog(disable(client))

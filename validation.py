@@ -1,13 +1,13 @@
 from pymongo import MongoClient
 import json
+
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
-
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
 try:
-    uri = "mongodb+srv://TyphonBotDB:sarthak13@typhonbotcluster.dxwct.mongodb.net/?retryWrites=true&w=majority"
-    db_client = MongoClient(uri)
-
+    db_client = MongoClient(config["mongodb"])
 
     print("✅ | Successfully Connected to MongoDB!")
 except Exception as e:
