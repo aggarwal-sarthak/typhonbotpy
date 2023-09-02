@@ -11,7 +11,7 @@ class hide(commands.Cog):
 
     @commands.has_permissions(manage_channels=True)
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.command(description='Hides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel(s)]", pass_context= True)
+    @commands.command(description='Hides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel(s)]")
     async def hide(self, ctx):
         channels = ctx.message.channel_mentions
         mentions = ""
