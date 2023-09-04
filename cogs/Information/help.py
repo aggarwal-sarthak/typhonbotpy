@@ -13,8 +13,6 @@ class help(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns Help Menu For The Bot Commands', usage=f"{os.path.basename(__file__)[:-3]} [command]")
     async def help(self,ctx,*arg):
-        
-        #Fetching prefix
         res = self.client.db.guilds.find_one({"guild_id": ctx.guild.id})
         if res and "prefix" in res:
             prefix = res['prefix']
