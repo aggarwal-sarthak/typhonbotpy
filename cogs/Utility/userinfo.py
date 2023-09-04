@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import datetime,timeago
 import pytz
+from validation import is_command_enabled
 
 class userinfo(commands.Cog):
     def __init__(self, client):
@@ -12,8 +13,9 @@ class userinfo(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description="Returns Information For The Mentioned User", aliases=['user', 'ui', 'about'], usage=f"{os.path.basename(__file__)[:-3]} [User]")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def userinfo(self, ctx, member:discord.Member=None):
         if not member:

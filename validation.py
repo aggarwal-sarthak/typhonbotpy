@@ -8,7 +8,6 @@ with open('config.json', 'r') as f:
 
 try:
     db_client = MongoClient(config["mongodb"])
-
     print("✅ | Successfully Connected to MongoDB!")
 except Exception as e:
     print(e)
@@ -18,6 +17,6 @@ async def is_command_enabled(ctx):
     if(guild_info and 'cmds' in guild_info):
         disabled_commands = guild_info['cmds']
         if(ctx.command.name in disabled_commands):
-            await ctx.reply(f"{emotes['failed']} | The command `{ctx.command.name}` is Disabled in this Server!")
+            await ctx.reply(f"{emotes['failed']} | The Command `{ctx.command.name}` Is Disabled In This Server!")
             return False
     return True

@@ -3,6 +3,7 @@ import discord
 import os
 import confirmation
 from types import SimpleNamespace
+from validation import is_command_enabled
 
 class role(commands.Cog):
     def __init__(self, client):
@@ -12,9 +13,10 @@ class role(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    @commands.command(description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove <role(s)> <user(s)>\n{os.path.basename(__file__)[:-3]} add/remove all/bots/humans <role(s>)")
     async def role(self, ctx, mode, *ids):
         if(len(ids)==0):
             raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name="IDs"))

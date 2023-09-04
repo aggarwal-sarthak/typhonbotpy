@@ -1,6 +1,7 @@
 from discord.ext import commands
 import os
 import discord
+from validation import is_command_enabled
 
 class firstmsg(commands.Cog):
     def __init__(self, client):
@@ -10,8 +11,9 @@ class firstmsg(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.bot_has_permissions(embed_links=True, read_message_history=True)
     @commands.command(description='Returns First Message In The Channel By The User', usage=f"{os.path.basename(__file__)[:-3]} firstmsg [user]")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True, read_message_history=True)
     async def firstmsg(self, ctx, member: discord.Member=None):
         if not member:
             member = ctx.author

@@ -1,6 +1,7 @@
 from discord.ext import commands
 import os
 import discord
+from validation import is_command_enabled
 
 class voicekick(commands.Cog):
     def __init__(self, client):
@@ -10,9 +11,10 @@ class voicekick(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description='Voicekick A User From Voice Channel',aliases = ['vk', 'vkick'], usage=f"{os.path.basename(__file__)[:-3]} <user>")
+    @commands.check(is_command_enabled)
     @commands.has_guild_permissions(move_members=True)
     @commands.bot_has_guild_permissions(move_members=True)
-    @commands.command(description='Voicekick A User From Voice Channel',aliases = ['vk', 'vkick'], usage=f"{os.path.basename(__file__)[:-3]} <user>")
     async def voicekick(self, ctx, member: discord.Member):
         vcstate = member.voice
         if not vcstate or not vcstate.channel:

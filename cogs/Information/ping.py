@@ -2,7 +2,6 @@ from discord.ext import commands
 import os
 from validation import is_command_enabled
 
-
 class ping(commands.Cog):
     def __init__(self, client):
         self.client = client

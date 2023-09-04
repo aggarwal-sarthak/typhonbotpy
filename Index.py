@@ -6,7 +6,7 @@ import json
 import logging
 import sys
 from datetime import datetime
-from pymongo import MongoClient
+from validation import db_client
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -16,9 +16,6 @@ with open('emoji.json', 'r') as f:
 intents = discord.Intents.all()
 intents.presences = False
 intents.voice_states = True
-
-db_client = MongoClient(config["mongodb"])
-print("✅ | Successfully Connected to MongoDB!")
 
 def get_prefix(client, ctx):
     guild_info = db_client.typhonbot.guilds.find_one({"guild_id":ctx.guild.id})
@@ -35,15 +32,6 @@ client.db = db_client.typhonbot
 @client.event
 async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
-
-@client.event
-async def on_command(ctx):
-    guild_db = client.db.guilds.find_one({"guild_id":ctx.guild.id})
-    if('cmds' in guild_db):
-        cmds = guild_db['cmds']
-        if str(ctx.command) in cmds:
-            await ctx.reply(f"{client.emotes['failed']} | Command `{ctx.command}` Is Disabled In This Server!")
-            raise commands.CommandNotFound()
 
 @client.event
 async def on_command_error(ctx, error):

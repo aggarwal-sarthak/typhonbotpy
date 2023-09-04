@@ -3,6 +3,7 @@ import os
 import discord
 import timeago, datetime
 import pytz
+from validation import is_command_enabled
 
 class roleinfo(commands.Cog):
     def __init__(self, client):
@@ -12,8 +13,9 @@ class roleinfo(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns Information About Mentioned Role', usage=f"{os.path.basename(__file__)[:-3]} <role>")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def roleinfo(self, ctx, role: discord.Role=None):
         permissions = ", ".join(sorted([str(perms[0]).replace("_"," ").title() for perms in role.permissions if perms[1] is True]))

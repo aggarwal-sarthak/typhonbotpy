@@ -1,10 +1,8 @@
 import discord
 from discord.ext import commands
 import os
-import json
 import confirmation
-with open('emoji.json', 'r') as f:
-    emotes = json.load(f)
+from validation import is_command_enabled
 
 class kick(commands.Cog):
     def __init__(self, client):
@@ -14,9 +12,10 @@ class kick(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description="Kicks the Mentioned User",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
-    @commands.command(description="Kicks the Mentioned User",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
     async def kick(self,ctx,user:discord.Member,*reason: str):
         if(len(reason)!=0):
             reason = " ".join([x for x in reason])

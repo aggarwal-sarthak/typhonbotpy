@@ -1,5 +1,6 @@
 from discord.ext import commands
 import os
+from validation import is_command_enabled
 
 class hide(commands.Cog):
     def __init__(self, client):
@@ -9,9 +10,10 @@ class hide(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description='Hides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel(s)]")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(manage_channels=True)
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.command(description='Hides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel(s)]")
     async def hide(self, ctx):
         channels = ctx.message.channel_mentions
         mentions = ""

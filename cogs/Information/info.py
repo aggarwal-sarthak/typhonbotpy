@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import datetime
+from validation import is_command_enabled
 
 class info(commands.Cog):
     def __init__(self, client):
@@ -13,8 +14,9 @@ class info(commands.Cog):
         global start_time
         start_time = datetime.datetime.now()
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns Information About Bot', aliases=['botinfo'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.check(is_command_enabled)
     async def info(self, ctx):
         embedVar = discord.Embed(title="TYPHON BOT",color=0xfb7c04)
         embedVar.set_thumbnail(url=self.client.user.avatar)

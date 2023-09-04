@@ -2,6 +2,7 @@ from discord.ext import commands
 import os
 import discord
 import asyncio
+from validation import is_command_enabled
 
 class voicemove(commands.Cog):
     def __init__(self, client):
@@ -23,9 +24,10 @@ class voicemove(commands.Cog):
         voice_client = discord.utils.get(self.client.voice_clients, guild=new.guild)
         await voice_client.disconnect()
 
+    @commands.command(description='Voicemoves All Users From Voice Channel To Another',aliases = ['vm', 'vmove'], usage=f"{os.path.basename(__file__)[:-3]} <user>")
+    @commands.check(is_command_enabled)
     @commands.has_guild_permissions(move_members=True)
     @commands.bot_has_guild_permissions(move_members=True)
-    @commands.command(description='Voicemoves All Users From Voice Channel To Another',aliases = ['vm', 'vmove'], usage=f"{os.path.basename(__file__)[:-3]} <user>")
     @commands.cooldown(1, 60, commands.BucketType.guild)
     async def voicemove(self, ctx, *id: discord.VoiceChannel):
         if not ctx.author.voice:

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os 
+from validation import is_command_enabled
 
 class help(commands.Cog):
     def __init__(self, client):
@@ -10,8 +11,9 @@ class help(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns Help Menu For The Bot Commands', usage=f"{os.path.basename(__file__)[:-3]} [command]")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
     async def help(self,ctx,*arg):
         res = self.client.db.guilds.find_one({"guild_id": ctx.guild.id})
         if res and "prefix" in res:

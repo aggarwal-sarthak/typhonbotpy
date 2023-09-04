@@ -3,6 +3,7 @@ import discord
 import os
 import discord
 import json
+from validation import is_command_enabled
 
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
@@ -15,9 +16,10 @@ class announce(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description="Embed Builder",aliases=['embed','ann'],usage=f"{os.path.basename(__file__)[:-3]} <Channel>")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(description="Embed Builder",aliases=['embed','ann'],usage=f"{os.path.basename(__file__)[:-3]} <Channel>")
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def announce(self, ctx, channel: discord.TextChannel):
         embed_dict = dict()

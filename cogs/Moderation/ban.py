@@ -1,10 +1,8 @@
 import discord
 from discord.ext import commands
 import os
-import json
 import confirmation
-with open('emoji.json', 'r') as f:
-    emotes = json.load(f)
+from validation import is_command_enabled
 
 class ban(commands.Cog):
     def __init__(self, client):
@@ -14,9 +12,10 @@ class ban(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description="Bans Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
-    @commands.command(description="Bans Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
     async def ban(self,ctx,user: discord.Member,*reason: str):
         if(len(reason)!=0):
             reason = " ".join([x for x in reason])
@@ -28,12 +27,12 @@ class ban(commands.Cog):
             await ctx.reply(f"{self.client.emotes['failed']} | Cannot Ban the Owner!")
             return
         await position_check(self,ctx,role)
-        msg = await ctx.reply(f"You are about to ban: {user}",view=view)
+        msg = await ctx.reply(f"You Are About To Ban: {user}",view=view)
         await view.wait()
         if view.value == "1":
             if msg: await msg.delete()
             await ctx.guild.ban(user=user,reason=reason,delete_message_seconds=0)
-            await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> was banned successfully!")
+            await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> Was Banned successfully!")
             return False
         if view.value == "2":
             if msg: await msg.delete()

@@ -1,6 +1,7 @@
 from discord.ext import commands
 import os
 import discord
+from validation import is_command_enabled
 
 class leave(commands.Cog):
     def __init__(self, client):
@@ -11,6 +12,7 @@ class leave(commands.Cog):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
     @commands.command(description='Leaves The Server With Given ID', usage=f"{os.path.basename(__file__)[:-3]} <server_id>")
+    @commands.check(is_command_enabled)
     async def leave(self, ctx):
         guild = discord.utils.get(self.client.guilds, id=int(ctx))
 

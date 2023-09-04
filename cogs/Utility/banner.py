@@ -1,7 +1,7 @@
 from discord.ext import commands
 import os
 import discord
-import requests
+from validation import is_command_enabled
 
 class banner(commands.Cog):
     def __init__(self, client):
@@ -11,8 +11,9 @@ class banner(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns Banner For User/Server', usage=f"{os.path.basename(__file__)[:-3]} user\n{os.path.basename(__file__)[:-3]} server")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
     async def banner(self, ctx, mode, member: discord.Member=None):
         match mode:
             case "server" | "s":

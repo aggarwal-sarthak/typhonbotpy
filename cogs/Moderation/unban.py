@@ -1,10 +1,7 @@
-import discord
 from discord.ext import commands
 import os
-import json
 import confirmation
-with open('emoji.json', 'r') as f:
-    emotes = json.load(f)
+from validation import is_command_enabled
 
 class unban(commands.Cog):
     def __init__(self, client):
@@ -14,9 +11,10 @@ class unban(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description="Unbans Banned Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
-    @commands.command(description="Unbans Banned Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
     async def unban(self,ctx,user:int,*reason: str):
         banned = [entry.user.id async for entry in ctx.guild.bans()]
         if user not in banned:

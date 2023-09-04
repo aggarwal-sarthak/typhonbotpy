@@ -3,6 +3,7 @@ import os
 import discord
 import pagination
 from types import SimpleNamespace
+from validation import is_command_enabled
 
 class list(commands.Cog):
     def __init__(self, client):
@@ -12,9 +13,10 @@ class list(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
+    @commands.command(description='Returns List Of Mentioned Argument', usage=f"{os.path.basename(__file__)[:-3]} admins\n{os.path.basename(__file__)[:-3]} bans\n{os.path.basename(__file__)[:-3]} boosters\n{os.path.basename(__file__)[:-3]} bots\n{os.path.basename(__file__)[:-3]} emojis\n{os.path.basename(__file__)[:-3]} roles\n{os.path.basename(__file__)[:-3]} inrole <role>")
+    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
-    @commands.command(description='Returns List Of Mentioned Argument', usage=f"{os.path.basename(__file__)[:-3]} admins\n{os.path.basename(__file__)[:-3]} bans\n{os.path.basename(__file__)[:-3]} boosters\n{os.path.basename(__file__)[:-3]} bots\n{os.path.basename(__file__)[:-3]} emojis\n{os.path.basename(__file__)[:-3]} roles\n{os.path.basename(__file__)[:-3]} inrole <role>")
     async def list(self, ctx, mode, *role: discord.Role):
         embeds = []
         match mode:

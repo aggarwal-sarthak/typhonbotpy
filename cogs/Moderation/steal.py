@@ -1,12 +1,10 @@
 import discord
 from discord.ext import commands
-from discord import Button
 import os
 import json
-import urllib
-import base64
 import aiohttp
 from io import BytesIO
+from validation import is_command_enabled
 
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
@@ -20,6 +18,9 @@ class steal(commands.Cog):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
     @commands.command(description="Add Emotes and Stickers to Server",aliases=['add'],usage=f"{os.path.basename(__file__)[:-3]} <emote>")
+    @commands.check(is_command_enabled)
+    @commands.has_permissions(manage_expressions=True)
+    @commands.bot_has_permissions(manage_expressions=True)
     async def steal(self, ctx,*args):
         try:
             emoji = []

@@ -3,6 +3,7 @@ import os
 import discord
 import datetime,timeago
 import pytz
+from validation import is_command_enabled
 
 class snipe(commands.Cog):
     def __init__(self, client):
@@ -17,8 +18,9 @@ class snipe(commands.Cog):
     async def on_message_delete(self, message):
         self.deleted_messages[message.channel.id] = message
 
-    @commands.bot_has_permissions(embed_links=True)
     @commands.command(description='Returns Last Deleted Messaged In The Channel', usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def snipe(self, ctx):
         if ctx.channel.id not in self.deleted_messages:
