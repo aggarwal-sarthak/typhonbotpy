@@ -22,34 +22,32 @@ class steal(commands.Cog):
     @commands.has_permissions(manage_expressions=True)
     @commands.bot_has_permissions(manage_expressions=True)
     async def steal(self, ctx,*args):
-        try:
-            emoji = []
-            if(ctx.message.reference is not None):
-                msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-                if(len(msg.stickers)>0):
-                    sticker = msg.stickers[0]
-                else:
-                    emoji = msg.content.split()     #needs emoji verification
+        emoji = []
+        if(ctx.message.reference is not None):
+            msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            if(len(msg.stickers)>0):
+                sticker = msg.stickers[0]
             else:
-                if(len(args)>0):
-                    for em in args:
-                        emoji.append(em)            #needs verif
-                elif(len(ctx.message.stickers)>0):
-                    sticker = ctx.message.stickers[0]
-                else:
-                    await ctx.reply(f"{self.client.emotes['failed']}| No emojis or stickers found!")
-            if(len(emoji)>0):
-                name, url = await get_name_url(emoji)
-                await send_view(self,ctx,emoji,name,url)
-            elif(sticker):
-                sticker_list = [sticker]
-                name = [sticker.name]
-                url = [sticker.url]
-                await send_view(self,ctx,sticker_list,name,url)
+                emoji = msg.content.split()     #needs emoji verification
+        else:
+            if(len(args)>0):
+                for em in args:
+                    emoji.append(em)            #needs verif
+            elif(len(ctx.message.stickers)>0):
+                sticker = ctx.message.stickers[0]
             else:
-                pass
-        except Exception as e:
-            print("\n\n\n\n\n\n",e)
+                await ctx.reply(f"{self.client.emotes['failed']}| No emojis or stickers found!")
+        if(len(emoji)>0):
+            name, url = await get_name_url(emoji)
+            await send_view(self,ctx,emoji,name,url)
+        elif(sticker):
+            sticker_list = [sticker]
+            name = [sticker.name]
+            url = [sticker.url]
+            await send_view(self,ctx,sticker_list,name,url)
+        else:
+            pass
+    
 
 async def send_view(self,ctx,emoji,name,url,page=0):
     if(len(emoji)==0): return
@@ -70,14 +68,12 @@ async def send_view(self,ctx,emoji,name,url,page=0):
     if view.value == "2":
         if msg: await msg.delete()
         async with aiohttp.ClientSession() as ses:
-            print("\n\n\n\n\n",url[page])
             async with ses.get(url[page]) as r:
                 try:
                     img_or_gif = BytesIO(await r.read())
                     b_value = img_or_gif.getvalue()
                     if r.status in range(200, 299):
                         emj = await guild.create_custom_emoji(image=b_value, name=name[page].replace(' ','_'))
-                        print(f'Successfully created emoji: <:{emj.name}:{emj.id}>')
                         await ctx.send(f'{self.client.emotes["success"]} | Successfully created emoji: <{"a" if emj.animated else ""}:{emj.name}:{emj.id}>')
                         emoji.pop(page)
                         name.pop(page)
@@ -90,9 +86,7 @@ async def send_view(self,ctx,emoji,name,url,page=0):
                         
                 except discord.HTTPException as e:
                     if(e.code==30008): await ctx.send(f"{self.client.emotes['failed']} | Emoji Slots are full!")
-                    else: 
-                        await ctx.send('File size is too big!')
-                        print("\n\n\n\n",e.code,e.text,e.status,e.response)
+                    else: await ctx.send(f"{self.client.emotes['failed']} | {e.text}")
         await send_view(self,ctx,emoji,name,url,page)
 
     if view.value == "3":
@@ -109,6 +103,7 @@ async def send_view(self,ctx,emoji,name,url,page=0):
                     if(page==len(emoji)): page = page-1
                 except discord.HTTPException as e:
                     if(e.code==30039): await ctx.send(f"{self.client.emotes['failed']} | Sticker Slots are full!")
+                    else: await ctx.send(f"{self.client.emotes['failed']} | {e.text}")
                     
                 await ses.close()
         await send_view(self,ctx,emoji,name,url,page)
@@ -128,7 +123,6 @@ async def get_name_url(emoji):
     name  = []
     url = []
     for emote in emoji:
-        print(emoji,emote)
         if emote[1]=='a':
             index = emote.find(":",5)
             name.append(emote[3:index])
@@ -140,7 +134,7 @@ async def get_name_url(emoji):
     return name,url
 
 async def create_embed(url,pgno):
-    embed = discord.Embed(title="Emoji")
+    embed = discord.Embed(title=f"Emoji {pgno+1}/{len(url)}",color=0xfb7c04)
     embed.set_image(url=url[pgno])
     return embed
 
