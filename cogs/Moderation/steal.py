@@ -37,9 +37,18 @@ class steal(commands.Cog):
                 sticker = ctx.message.stickers[0]
             else:
                 await ctx.reply(f"{self.client.emotes['failed']}| No emojis or stickers found!")
+                return
+        
         if(len(emoji)>0):
-            name, url = await get_name_url(emoji)
-            await send_view(self,ctx,emoji,name,url)
+            for emote in emoji:
+                if('<' not in emote or '>' not in emote or ':' not in emote):
+                    emoji.remove(emote)
+            if(len(emoji)>0):
+                name, url = await get_name_url(emoji)
+                await send_view(self,ctx,emoji,name,url)
+            else:
+                await ctx.reply(f"{self.client.emotes['failed']}| No emojis or stickers found!")
+                return
         elif(sticker):
             sticker_list = [sticker]
             name = [sticker.name]
