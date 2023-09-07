@@ -41,18 +41,19 @@ class steal(commands.Cog):
             if(len(emoji)>0):
                 name, url = await get_name_url(emoji)
                 await send_view(self,ctx,emoji,name,url)
-                # page = 0 
-                # name, url = await get_name_url(emoji)
-                # embed = await create_embed(url,page)
-                # view = Buttons(ctx)
-                # message = await ctx.reply(embed=embed,view=view)
-                # await view.wait()
+            elif(sticker):
+                sticker_list = [sticker]
+                name = [sticker.name]
+                url = [sticker.url]
+                await send_view(self,ctx,sticker_list,name,url)
             else:
                 pass
         except Exception as e:
             print("\n\n\n\n\n\n",e)
 
 async def send_view(self,ctx,emoji,name,url,page=0):
+    if(len(emoji)==0): return
+    guild = ctx.guild
     embed = await create_embed(url,page)
     view = Buttons(ctx)
     msg = await ctx.reply(embed=embed,view=view)
@@ -68,36 +69,52 @@ async def send_view(self,ctx,emoji,name,url,page=0):
         return False
     if view.value == "2":
         if msg: await msg.delete()
-        # print("\n\n\n\n\n ctx guild",ctx.guild,url[page])
-        # image = urllib.request.urlopen(url[page]).read()
-        # image = base64.b64encode(image)
-        # print(image)
-        # await ctx.guild.create_custom_emoji(name=name,image=url[page])
-        # return False
-        guild = ctx.guild
-        if ctx.author.guild_permissions.manage_emojis:
-            async with aiohttp.ClientSession() as ses:
-                async with ses.get(url[page]) as r:
-                    try:
-                        img_or_gif = BytesIO(await r.read())
-                        b_value = img_or_gif.getvalue()
-                        if r.status in range(200, 299):
-                            emj = await guild.create_custom_emoji(image=b_value, name=name[page])
-                            print(f'Successfully created emoji: <:{emj.name}:{emj.id}>')
-                            await ctx.send(f'Successfully created emoji: <:{emj.name}:{emj.id}>')
-                            await ses.close()
-                            print("\n\n\n\n\n\nadded emote")
-                        else:
-                            await ctx.send(f'Error when making request | {r.status} response.')
-                            await ses.close()
-                            
-                    except discord.HTTPException as e:
+        async with aiohttp.ClientSession() as ses:
+            print("\n\n\n\n\n",url[page])
+            async with ses.get(url[page]) as r:
+                try:
+                    img_or_gif = BytesIO(await r.read())
+                    b_value = img_or_gif.getvalue()
+                    if r.status in range(200, 299):
+                        emj = await guild.create_custom_emoji(image=b_value, name=name[page].replace(' ','_'))
+                        print(f'Successfully created emoji: <:{emj.name}:{emj.id}>')
+                        await ctx.send(f'{self.client.emotes["success"]} | Successfully created emoji: <{"a" if emj.animated else ""}:{emj.name}:{emj.id}>')
+                        emoji.pop(page)
+                        name.pop(page)
+                        url.pop(page)
+                        if(page==len(emoji)): page = page-1
+                        await ses.close()
+                    else:
+                        await ctx.send(f'Error when making request | {r.status} response.')
+                        await ses.close()
+                        
+                except discord.HTTPException as e:
+                    if(e.code==30008): await ctx.send(f"{self.client.emotes['failed']} | Emoji Slots are full!")
+                    else: 
                         await ctx.send('File size is too big!')
-            await send_view(self,ctx,emoji,name,url,page)
+                        print("\n\n\n\n",e.code,e.text,e.status,e.response)
+        await send_view(self,ctx,emoji,name,url,page)
 
     if view.value == "3":
         if msg: await msg.delete()
-        return False
+        async with aiohttp.ClientSession() as ses:
+            async with ses.get(url[page]) as resp:
+                file = discord.File(fp=BytesIO(await resp.read()), filename="sticker.png") 
+                try:
+                    sticker = await guild.create_sticker(name=name[page],description="",file=file,emoji="👌")
+                    await ctx.send(f'{self.client.emotes["success"]} | Successfully created Sticker:',stickers=[sticker])
+                    emoji.pop(page)
+                    name.pop(page)
+                    url.pop(page)
+                    if(page==len(emoji)): page = page-1
+                except discord.HTTPException as e:
+                    if(e.code==30039): await ctx.send(f"{self.client.emotes['failed']} | Sticker Slots are full!")
+                    
+                await ses.close()
+        await send_view(self,ctx,emoji,name,url,page)
+
+    
+        
     if view.value == '4':
         if msg: await msg.delete()
         if(page==len(emoji)-1):
@@ -136,28 +153,28 @@ class Buttons(discord.ui.View):
     def __init__ (self, ctx, *, timeout=60):
         super().__init__(timeout=timeout)
         self.ctx = ctx
-    @discord.ui.button(label="Previous", style=discord.ButtonStyle.green)
+    @discord.ui.button(emoji="◀", style=discord.ButtonStyle.green, row=0)
     async def button1_call(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user != self.ctx.author:
             return await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
         self.value = "1"
         self.stop()
         await interaction.response.defer()
-    @discord.ui.button(label="Add as Emote", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Add as Emote", style=discord.ButtonStyle.primary, row=1)
     async def button2_call(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user != self.ctx.author:
             return await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
         self.value = "2"
         self.stop()
         await interaction.response.defer()
-    @discord.ui.button(label="Add as Sticker", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Add as Sticker", style=discord.ButtonStyle.primary, row=1)
     async def button3_call(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user != self.ctx.author:
             return await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
         self.value = "3"
         self.stop()
         await interaction.response.defer()
-    @discord.ui.button(label="Next")
+    @discord.ui.button(emoji="▶", style=discord.ButtonStyle.green, row=0)
     async def button4_call(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user != self.ctx.author:
             return await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
