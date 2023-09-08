@@ -23,25 +23,25 @@ class role(commands.Cog):
         if(mode.lower() not in ['add','remove']):
             raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name ="mode"))
         mode = mode.lower()
+        category = ids[0]
         ids = await parse_ids(ids)
         member_list=[]
         role_list=[]
         member_string=""
         role_string="" 
-        
-        if(ids[0] in ["all","a"]):
-            for member in ctx.message.guild.members:
+        if(category in ["all","a"]):
+            for member in ctx.guild.members:
                 member_list.append(str(member.id))
-            role_list.extend(ids[1:])    
-        elif(ids[0] in ["humans","human",'h']):
+            role_list.extend(ids)    
+        elif(category in ["humans","human",'h']):
             for member in ctx.message.guild.members:
                 if member.bot==False: member_list.append(str(member.id))
-            role_list.extend(ids[1:])   
+            role_list.extend(ids)   
 
-        elif(ids[0] in ['bots','bot','b']):
+        elif(category in ['bots','bot','b']):
             for member in ctx.message.guild.members:
                 if member.bot==True: member_list.append(str(member.id))
-            role_list.extend(ids[1:])   
+            role_list.extend(ids)   
 
         else:
             for id in ids:
