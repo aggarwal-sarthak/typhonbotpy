@@ -10,7 +10,7 @@ class purge(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.group(name='purge', description='Clears Messages For Given Parameters', aliases = ['clear'], invoke_without_command=True)
+    @commands.group(name='purge', description='Clears Messages For Given Parameters', aliases = ['clear'], usage = f"{os.path.basename(__file__)[:-3]} <amount>", invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
