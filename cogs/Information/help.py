@@ -22,6 +22,10 @@ class help(commands.Cog):
             prefix = self.client.config['prefix']
         if(len(arg)):
             cmd = self.client.get_command(arg[0].lower())
+            if(len(arg)>1):
+                subcmd = cmd.get_command(arg[1].lower())
+                if(subcmd is not None):
+                    cmd = subcmd
             menu = discord.Embed(title="Command Details",color=0xfb7c04, description=f"```- [] = Optional Arguments\n- <> = Required Arguments\n- Do Not Type These When Using Commands!```\n> {cmd.description}")
             if (cmd.aliases):
                 aliases = '`, `'.join([c for c in cmd.aliases])
@@ -30,6 +34,8 @@ class help(commands.Cog):
             menu.add_field(name="Aliases", value=f"`{aliases}`")
             usage = (prefix+cmd.usage).replace('\n',f'\n{prefix}')
             menu.add_field(name="Usage", value=f'`{usage}`',inline=False)
+            if isinstance(cmd,commands.Group):
+                menu.add_field(name="Subcommands", value=f'`{", ".join([c.name for c in cmd.commands])}`',inline=False)
             menu.add_field(name="Cooldown", value=f'`{str(int(cmd.cooldown.per))+"s" if cmd.cooldown is not None else "No Cooldown!"}`',inline=False)
             await ctx.reply(embed=menu)
         else:
