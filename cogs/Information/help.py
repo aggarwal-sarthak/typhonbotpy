@@ -22,6 +22,7 @@ class help(commands.Cog):
             prefix = self.client.config['prefix']
         if(len(arg)):
             cmd = self.client.get_command(arg[0].lower())
+            if cmd is None: return
             if(len(arg)>1):
                 subcmd = cmd.get_command(arg[1].lower())
                 if(subcmd is not None):
@@ -32,8 +33,9 @@ class help(commands.Cog):
             else:
                 aliases = "None"
             menu.add_field(name="Aliases", value=f"`{aliases}`")
-            usage = (prefix+cmd.usage).replace('\n',f'\n{prefix}')
-            menu.add_field(name="Usage", value=f'`{usage}`',inline=False)
+            if(cmd.usage):
+                usage = (prefix+cmd.usage).replace('\n',f'\n{prefix}')
+                menu.add_field(name="Usage", value=f'`{usage}`',inline=False)
             if isinstance(cmd,commands.Group):
                 menu.add_field(name="Subcommands", value=f'`{", ".join([c.name for c in cmd.commands])}`',inline=False)
             menu.add_field(name="Cooldown", value=f'`{str(int(cmd.cooldown.per))+"s" if cmd.cooldown is not None else "No Cooldown!"}`',inline=False)

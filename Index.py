@@ -44,7 +44,11 @@ async def on_command_error(ctx, error):
         return
     
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.invoke(client.get_command('help'), ctx.command.name)
+        if ctx.command.parent is None:
+            await ctx.invoke(client.get_command('help'), ctx.command.name)
+        else:
+            await ctx.invoke(client.get_command('help'),ctx.command.parent.name, ctx.command.name)
+
 
     if isinstance(error, commands.CommandOnCooldown):
         now = datetime.now()
