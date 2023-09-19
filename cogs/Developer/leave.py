@@ -14,6 +14,7 @@ class leave(commands.Cog):
     @commands.command(description='Leaves The Server With Given ID', usage=f"{os.path.basename(__file__)[:-3]} <server_id>")
     @commands.check(is_command_enabled)
     async def leave(self, ctx):
+        if ctx.author.id not in self.client.config["owner"]: return
         guild = discord.utils.get(self.client.guilds, id=int(ctx))
 
         if guild:

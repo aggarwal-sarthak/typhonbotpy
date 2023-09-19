@@ -13,6 +13,7 @@ class load(commands.Cog):
     @commands.command(description='Loads A Given Command', usage=f"{os.path.basename(__file__)[:-3]}")
     @commands.check(is_command_enabled)
     async def load(self, ctx, cog: str):
+        if ctx.author.id not in self.client.config["owner"]: return
         await self.client.load_extension(f'cogs.{cog}')
         await ctx.reply(f"{self.client.emotes['success']} | Command {cog} Loaded Successfully!")
 

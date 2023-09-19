@@ -148,12 +148,6 @@ import confirmation
 from types import SimpleNamespace
 from validation import is_command_enabled
 
-class Mode(commands.Converter):
-    def mode_check(arg):
-        if arg not in ['add', 'remove']:
-            raise commands.BadArgument("Argument Must be Add or Remove!")
-        return arg.lower()
-
 class role(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -162,29 +156,29 @@ class role(commands.Cog):
     async def on_ready(self):
         print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
 
-    @commands.group(name='role', description='Add/Remove Roles', aliases=['r'], usage=f"{os.path.basename(__file__)[:-3]} add/remove", invoke_without_command=True)
+    @commands.group(name='role', description='Add/Remove Roles', aliases=['r'], invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    async def role(self, ctx, mode: Mode, *ids):
+    async def role(self, ctx, *ids):
         await ctx.send("role")
         print("\n\n\n\n\nrole")
 
-    @role.command(name='add', description='Add Roles', aliases=['+'])
+    @role.group(name='Add', description='Add Roles', aliases=['a'], invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    async def add(self, ctx, mode: Mode):
+    async def add(self, ctx):
         await ctx.send("add")
         print("\n\n\n\n\nadd")
 
-    # @add.command (name='all', description='Add Roles To Everyone', aliases=['a'])
-    # @commands.check(is_command_enabled)
-    # @commands.has_permissions(manage_roles=True)
-    # @commands.bot_has_permissions(manage_roles=True)
-    # async def all(self, ctx):
-    #     await ctx.send("all")
-    #     print("\n\n\n\n\nall")
+    @add.command(name='all', description='Add Roles To Everyone', aliases=['a'])
+    @commands.check(is_command_enabled)
+    @commands.has_permissions(manage_roles=True)
+    @commands.bot_has_permissions(manage_roles=True)
+    async def all(self, ctx):
+        await ctx.send("all")
+        print("\n\n\n\n\nall")
 
 async def parse_ids(ids):
     parsed_ids = []

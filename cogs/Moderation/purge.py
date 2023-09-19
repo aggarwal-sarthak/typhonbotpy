@@ -32,7 +32,7 @@ class purge(commands.Cog):
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
-    async def bots(self, ctx, amount: int):
+    async def humans(self, ctx, amount: int):
         def check(message):
             return not message.pinned and not message.author.bot
         await delete(self, ctx, amount, check)
@@ -41,7 +41,7 @@ class purge(commands.Cog):
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
-    async def bots(self, ctx, amount: int):
+    async def embeds(self, ctx, amount: int):
         def check(message):
             return not message.pinned and message.embeds
         await delete(self, ctx, amount, check)
@@ -50,7 +50,7 @@ class purge(commands.Cog):
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
-    async def bots(self, ctx, amount: int):
+    async def images(self, ctx, amount: int):
         def check(message):
             return not message.pinned and (message.attachments or ('.jpg' or '.jpeg' or '.png' or '.webp') in message.content)
         await delete(self, ctx, amount, check)

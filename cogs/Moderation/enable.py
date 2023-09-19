@@ -9,7 +9,7 @@ class enable(commands.Cog):
     @commands.command(usage=f"{os.path.basename(__file__)[:-3]} <command>", description = "Enables The Mentioned Command", aliases=["en"])
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
-    @commands.cooldown(1, 2, commands.BucketType.member)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     async def enable(self, ctx:commands.Context, cmnd: str):
         command = self.client.get_command(cmnd)
         if command is None: await ctx.reply(f"{self.client.emotes['failed']} | {cmnd} Is Not A Command!")

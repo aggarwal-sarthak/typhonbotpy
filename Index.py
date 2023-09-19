@@ -49,7 +49,6 @@ async def on_command_error(ctx, error):
         else:
             await ctx.invoke(client.get_command('help'),ctx.command.parent.name, ctx.command.name)
 
-
     if isinstance(error, commands.CommandOnCooldown):
         now = datetime.now()
         now = datetime.timestamp(now)
