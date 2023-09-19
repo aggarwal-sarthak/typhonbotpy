@@ -9,21 +9,16 @@ class list(commands.Cog):
         self.client = client
         self.embeds = []
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
-    @commands.group(name='list', description='Returns List of Members', aliases=['dump', 'inrole'], invoke_without_command=True)
+    @commands.group(name='list', description='Returns List of Members', usage=f'{os.path.basename(__file__)[:-3]} <role>', aliases=['dump', 'inrole'], invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
     async def list(self, ctx, role: discord.Role):
-        data = [member for member in role[0].members]
+        data = [member for member in role.members]
         title = f"Members In Role : {len(data)}"
         await mention_pagination(self, ctx, data, self.embeds, title)
     
-    @list.command(name='admins', description='Returns List of Admins', aliases=['admin'])
-    @commands.check(is_command_enabled)
+    @list.command(name='admins', description='Returns List of Admins', aliases=['admin', 'administrator'])
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
     async def admins(self, ctx):
@@ -32,7 +27,6 @@ class list(commands.Cog):
         await mention_pagination(self, ctx, data, self.embeds, title)
 
     @list.command(name='bans', description='Returns List of Banned Members', aliases=['ban', 'banned'])
-    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True, ban_members=True)
     async def bans(self, ctx):
@@ -41,7 +35,6 @@ class list(commands.Cog):
         await mention_pagination(self, ctx, data, self.embeds, title)
 
     @list.command(name='boosters', description='Returns List of Server Boosters', aliases=['booster', 'premium'])
-    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
     async def boosters(self, ctx):
@@ -50,7 +43,6 @@ class list(commands.Cog):
         await mention_pagination(self, ctx, data, self.embeds, title)
 
     @list.command(name='bots', description='Returns List of Bots', aliases=['bot'])
-    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
     async def bots(self, ctx):
@@ -59,7 +51,6 @@ class list(commands.Cog):
         await mention_pagination(self, ctx, data, self.embeds, title)
 
     @list.command(name='emojis', description='Returns List of Server Emojis', aliases=['emoji', 'emo'])
-    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
     async def emojis(self, ctx):
@@ -75,7 +66,6 @@ class list(commands.Cog):
         await pagination_check(self, ctx, data, self.embeds)
 
     @list.command(name='roles', description='Returns List of Roles', aliases=['role'])
-    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
     async def roles(self, ctx):

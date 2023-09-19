@@ -6,10 +6,6 @@ class ping(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
     @commands.command(description='Returns Bot Ping', usage=f"{os.path.basename(__file__)[:-3]}")
     @commands.check(is_command_enabled)
     async def ping(self, ctx):

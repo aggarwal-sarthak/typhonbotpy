@@ -13,28 +13,29 @@ class disable(commands.Cog):
     async def disable(self, ctx:commands.Context, cmnd: str):
         command = self.client.get_command(cmnd)
         if(command.name=="disable" or command.name=="enable"):
-            await ctx.reply(f"{self.client.emotes['failed']} | Cannot Disable `{command.name}`!")
-            return
+            return await ctx.reply(f"{self.client.emotes['failed']} | Cannot Disable `{command.name}`!")
+            
         if command is None: await ctx.reply(f"{self.client.emotes['failed']} | {cmnd} Is Not A Command!")
         guild_db = self.client.db.guilds.find_one({"guild_id":ctx.guild.id})
+
         if not guild_db:
             self.client.db.guilds.insert_one({
                 "guild_id": ctx.guild.id,
                 "cmds": [command.name]
             })
-            await ctx.reply(f"{self.client.emotes['success']} | Command `{command.name}` Disabled For This Server!")
-        else:
-            if('cmds' in guild_db):
-                cmds = guild_db['cmds']
-                if(command.name in cmds):
-                    await ctx.reply(f"{self.client.emotes['failed']} | Command `{command.name}` Is Already Disabled!")
-                    return
-                cmds.append(command.name)
-            else:
-                cmds = [command.name]
-            self.client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"cmds":cmds}})
-            await ctx.reply(f"{self.client.emotes['success']} | Command `{command.name}` Disabled For This Server!")
+            return await ctx.reply(f"{self.client.emotes['success']} | Command `{command.name}` Disabled For This Server!")
+        
+        if('cmds' in guild_db):
+            cmds = guild_db['cmds']
+            if(command.name in cmds):
+                return await ctx.reply(f"{self.client.emotes['failed']} | Command `{command.name}` Is Already Disabled!")
                 
-            
+            cmds.append(command.name)
+        else:
+            cmds = [command.name]
+
+        self.client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"cmds":cmds}})
+        await ctx.reply(f"{self.client.emotes['success']} | Command `{command.name}` Disabled For This Server!")
+                
 async def setup(client):
     await client.add_cog(disable(client))

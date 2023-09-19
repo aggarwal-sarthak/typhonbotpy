@@ -7,10 +7,6 @@ class maintenance(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
     @commands.group(name='maintenance', description='Enables/Disables Maintenance Mode For Server', usage=f"{os.path.basename(__file__)[:-3]} on/off", aliases=['mm', 'mmode'])
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
@@ -19,7 +15,6 @@ class maintenance(commands.Cog):
         pass
 
     @maintenance.command(name='on', description='Enables Maintenance Mode For Server', usage=f"{os.path.basename(__file__)[:-3]} on", aliases=['enable'])
-    @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(manage_channels=True)
     @commands.cooldown(1, 60, commands.BucketType.guild)

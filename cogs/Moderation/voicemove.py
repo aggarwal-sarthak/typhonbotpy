@@ -9,10 +9,6 @@ class voicemove(commands.Cog):
         self.client = client
 
     @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
-    @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
         if member == self.client.user and (before.channel and after.channel) != None and before.channel != after.channel:
             oldmem = before.channel.members if before.channel else []
@@ -43,14 +39,16 @@ class voicemove(commands.Cog):
             try:
                 await channel.connect()
                 await ctx.reply(f"{self.client.emotes['success']} | Move Me To New Channel To Start Voicemove!")
-
                 await self.client.wait_for('voice_state_update', timeout=30)
+
             except discord.ClientException:
                 await ctx.reply(f"{self.client.emotes['failed']} | I'm Already Connect To A Voice Channel!")
+
             except asyncio.TimeoutError:
                 await ctx.reply(f"{self.client.emotes['failed']} | Command Timed Out!")
                 voice_client = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
                 await voice_client.disconnect()
+
             except Exception as e:
                 await ctx.reply(f"{self.client.emotes['failed']} | Error Connecting To Voice Channel!")
             

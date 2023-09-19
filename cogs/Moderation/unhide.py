@@ -6,10 +6,6 @@ class unhide(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
     @commands.command(description='Unhides Current/Mentioned Channel(s) For Everyone', usage=f"{os.path.basename(__file__)[:-3]} [channel(s)]")
     @commands.check(is_command_enabled)
     @commands.has_permissions(manage_channels=True)
@@ -19,6 +15,7 @@ class unhide(commands.Cog):
         mentions = ""
         if not channel:
             channel = [ctx.channel]
+            
         for c in channel:
             perms = c.overwrites_for(ctx.guild.default_role)
             perms.view_channel = True

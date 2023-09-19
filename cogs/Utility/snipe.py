@@ -11,10 +11,6 @@ class snipe(commands.Cog):
         self.deleted_messages = {}
 
     @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
-    @commands.Cog.listener()
     async def on_message_delete(self, message):
         self.deleted_messages[message.channel.id] = message
 
@@ -24,8 +20,7 @@ class snipe(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def snipe(self, ctx):
         if ctx.channel.id not in self.deleted_messages:
-            await ctx.reply(f"{self.client.emotes['failed']} | No Deleted Messages Found In This Channel!")
-            return
+            return await ctx.reply(f"{self.client.emotes['failed']} | No Deleted Messages Found In This Channel!")
 
         embed = discord.Embed(title='Message Found',color=0xfb7c04)
         embed.add_field(name="**__Information__**", value=f"**Message By :** {self.deleted_messages[ctx.channel.id].author.mention}\n**Channel :** {ctx.channel.mention}\n**Time :** {timeago.format(self.deleted_messages[ctx.channel.id].created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),datetime.datetime.now())}", inline=False)

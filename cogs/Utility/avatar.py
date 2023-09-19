@@ -7,10 +7,6 @@ class avatar(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
     @commands.command(description='Returns User Avatar', usage=f"{os.path.basename(__file__)[:-3]}")
     @commands.check(is_command_enabled)
     @commands.bot_has_permissions(embed_links=True)

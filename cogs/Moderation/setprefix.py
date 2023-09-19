@@ -14,8 +14,7 @@ class setprefix(commands.Cog):
         guild_db = self.client.db.guilds.find_one({"guild_id":ctx.guild.id})
         
         if(len(symbol)>4):
-            await ctx.reply(f"{self.client.emotes['failed']} | Prefix Cannot Be Longer Than 4 Characters!")
-            return
+            return await ctx.reply(f"{self.client.emotes['failed']} | Prefix Cannot Be Longer Than 4 Characters!")
         
         if not guild_db and symbol != self.client.config["prefix"]:
             self.client.db.guilds.insert_one({

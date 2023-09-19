@@ -13,6 +13,7 @@ class enable(commands.Cog):
     async def enable(self, ctx:commands.Context, cmnd: str):
         command = self.client.get_command(cmnd)
         if command is None: await ctx.reply(f"{self.client.emotes['failed']} | {cmnd} Is Not A Command!")
+        
         guild_db = self.client.db.guilds.find_one({"guild_id":ctx.guild.id})
         if(not guild_db or 'cmds' not in guild_db):
             await ctx.reply(f"{self.client.emotes['failed']} | Command `{command.name}` Is Already Enabled!")

@@ -12,10 +12,6 @@ class announce(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
     @commands.command(description="Embed Builder",aliases=['embed','ann'],usage=f"{os.path.basename(__file__)[:-3]} <Channel>")
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
@@ -62,9 +58,9 @@ async def get_title(self,ctx):
     bot_embed = discord.Embed(title='Embed Builder : Title',description="Enter The Title Of The Announcement\n[Note] : The Title Must Not Exceed 256 Character Limit\n\n[None] : Type None For No Title\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     title = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
+    
     if(title.content.lower()=="cancel"):
-        await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
-        raise commands.CommandError("Command Cancelled")
+        return await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
     else:
         title = await parse_input(title)
     return title
@@ -73,9 +69,9 @@ async def get_description(self,ctx):
     bot_embed = discord.Embed(title='Embed Builder : Description',description="Enter The Description Of The Announcement\n[Note] : The Description Must Not Exceed 4096 Character Limit\n\n[None] : Type None For No Description\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     description = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
+    
     if(description.content.lower()=="cancel"):
-        await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
-        raise commands.CommandError("Command Cancelled")
+        return await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
     else:
         description=await parse_input(description)
     return description
@@ -84,9 +80,9 @@ async def get_color(self,ctx):
     bot_embed = discord.Embed(title='Embed Builder : Color',description="Enter The Color Of The Announcement\n[Note] : The Color Must Be In HexCode Format\n\n[None] : Type None For No Color\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     color = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
+    
     if(color.content.lower()=="cancel"):
-        await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
-        raise commands.CommandError("Command Cancelled")
+        return await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
     else:
         color = await parse_input(color)
         if(color):
@@ -106,12 +102,12 @@ async def get_thumbnail(self,ctx,user_embed):
     bot_embed = discord.Embed(title='Embed Builder : Thumbnail',description="Enter The Thumbnail Of The Announcement\n[Note] : Must Be an Attachment or In Link Format\n\n[None] : Type None For No Thumbnail\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     thumbnail = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
+    
     if(len(thumbnail.attachments)!=0):
         user_embed.set_thumbnail(url=thumbnail.attachments[0].proxy_url)
 
     elif(thumbnail.content.lower()=="cancel"):
-        await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
-        raise commands.CommandError("Command Cancelled")
+        return await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
     else:
         thumbnail = await parse_input(thumbnail)
         if(thumbnail!=None):
@@ -134,12 +130,11 @@ async def get_image(self,ctx,user_embed):
     bot_embed = discord.Embed(title='Embed Builder : Image',description="Enter The Image Of The Announcement\n[Note] : Must Be an Attachment or In Link Format\n\n[None] : Type None For No Image\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     image = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
+    
     if(len(image.attachments)!=0):
         user_embed.set_image(url=image.attachments[0].proxy_url)
-    
     elif(image.content.lower()=="cancel"):
-        await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
-        raise commands.CommandError("Command Cancelled")
+        return await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
     else:
         image = await parse_input(image)
         if(image!=None):
@@ -155,9 +150,9 @@ async def get_footer(self,ctx,user_embed):
     bot_embed = discord.Embed(title='Embed Builder : Footer',description="Enter The Footer Of The Announcement\n[Note] : The Footer Must Not Exceed 2048 Character Limit\n\n[None] : Type None For No Footer\n[Cancel] : Type Cancel To Cancel Embed Builder",color=0xfb7c04)
     await ctx.reply(embed=bot_embed)
     footer = await self.client.wait_for("message",timeout=60,check=lambda message:message.author==ctx.author and message.channel==ctx.channel)
+    
     if(footer.content.lower()=="cancel"):
-        await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
-        raise commands.CommandError("Command Cancelled")
+        return await ctx.reply(f"{self.client.emotes['success']} | Embed Builder Cancelled Successfully!")
     else:
         footer = await parse_input(footer)
         user_embed.set_footer(text=footer)
@@ -180,12 +175,12 @@ async def send_view(self,ctx,channel,user_embed,embed_dict):
     if view.value == "1":
         if msg: await msg.delete()
         await ctx.reply(f"{self.client.emotes['success']} | Message Announced Successfully!")
-        await channel.send(embed=user_embed)
-        return False
+        return await channel.send(embed=user_embed)
+
     if view.value == "2":
         if msg: await msg.delete()
-        await ctx.reply(f"{self.client.emotes['success']} | Message Cancelled Successfully!")
-        return False
+        return await ctx.reply(f"{self.client.emotes['success']} | Message Cancelled Successfully!")
+
     if view.value == '3':
         if msg: await msg.delete()
         await ctx.reply(f"{self.client.emotes['success']} | Enter The Field To Edit!")

@@ -18,6 +18,8 @@ intents.presences = False
 intents.voice_states = True
 
 def get_prefix(client, ctx):
+    if ctx.content.startswith(client.user.mention + ' '): return f'{client.user.mention} '
+    elif ctx.content.startswith(client.user.mention): return f'{client.user.mention}'
     guild_info = db_client.typhonbot.guilds.find_one({"guild_id":ctx.guild.id})
     if(guild_info and 'prefix' in guild_info):
         return guild_info['prefix']
@@ -113,7 +115,8 @@ async def load():
     for folder in os.listdir("./cogs"):
         for filename in os.listdir(f'./cogs/{folder}'):
             if filename.endswith(".py"):
-                await client.load_extension(f"cogs.{folder}.{filename[:-3]}")
+                file = await client.load_extension(f"cogs.{folder}.{filename[:-3]}")
+                print(f"✅ | {filename[:-3]} Is Loaded!")
 
 async def main():
     async with client:

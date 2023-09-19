@@ -7,11 +7,7 @@ class leave(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"✅ | {os.path.basename(__file__)[:-3]} Is Loaded!")
-
-    @commands.command(description='Leaves The Server With Given ID', usage=f"{os.path.basename(__file__)[:-3]} <server_id>")
+    @commands.command(description='Leaves The Server With Given ID', usage=f"{os.path.basename(__file__)[:-3]} <serverid>")
     @commands.check(is_command_enabled)
     async def leave(self, ctx):
         if ctx.author.id not in self.client.config["owner"]: return
