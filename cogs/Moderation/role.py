@@ -70,14 +70,14 @@ class role(commands.Cog):
         
         else:
             if(len(role_list)<=10):
-                for r in role_list: role_string += "<@&" + str(ctx.guild.get_role(int(r)).id) + ">,"
+                for r in role_list: role_string += f'<@&{ctx.guild.get_role(int(r)).id}>,'
             else:
-                role_string = "`"+str(len(role_list)) + " roles``"
+                role_string =f'`{len(role_list)} roles``'
 
             if(len(member_list)<=10):
-                for m in member_list: member_string += "<@"+str(ctx.guild.get_member(int(m)).id) + ">,"
+                for m in member_list: member_string += f'<@{ctx.guild.get_member(int(m)).id}>,'
             else:
-                member_string = "`"+str(len(member_list)) + " members``"
+                member_string = f'`{len(member_list)} members``'
 
             view = confirmation.Buttons(ctx)
             embed = discord.Embed(title=f"{mode.capitalize()}?",description=f"**Roles: {role_string[:-1]}\nMembers: {member_string[:-1]}**",color=0xfb7c04)
@@ -87,27 +87,29 @@ class role(commands.Cog):
 
             if view.value == "1":
                 if msg: await msg.delete()
-                await ctx.message.add_reaction(self.client.emotes['success'])
+                msg = await ctx.reply(f'{self.client.emotes["loading"]} | Adding Roles!')
 
                 role_string = ""
                 member_string = ""
-                
+
                 if(len(role_list)<=10):
-                    for r in role_list: role_string += "`" + str(ctx.guild.get_role(int(r)).name) + "`,"
+                    for r in role_list: role_string += f'`{ctx.guild.get_role(int(r)).name}`,'
                 else:
-                    role_string = "`"+str(len(role_list)) + " roles``"
+                    role_string = f'`{len(role_list)} roles``'
                 if(len(member_list)<=10):
-                    for m in member_list: member_string += "`"+str(ctx.guild.get_member(int(m)).name) + "`,"
+                    for m in member_list: member_string += f'`{ctx.guild.get_member(int(m)).name}`,'
                 else:
-                    member_string = "`"+str(len(member_list)) + " members``"
+                    member_string = f'`{len(member_list)} members``'
 
                 match mode:
                     case 'add':
-                        await give_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
+                        await give_role(self, ctx, role_list, member_list, role_string, member_string)
                     case 'remove':
-                        await take_role(self=self, ctx=ctx, role_list=role_list, member_list=member_list,role_string=role_string,member_string=member_string)
+                        await take_role(self, ctx, role_list, member_list, role_string, member_string)
                     case _:
                         ctx.reply(f'{self.client.emotes["failed"]} Not a valid argument!')
+                
+                if msg: msg.delete()
 
             if view.value == "2":
                 if msg: await msg.delete()

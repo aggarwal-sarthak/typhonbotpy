@@ -37,34 +37,39 @@ async def on_ready():
 
 @client.event
 async def on_command_error(ctx, error):
-    print("\n\n\n\n\n", error)
+    if not isinstance(error, commands.CommandOnCooldown):
+        ctx.command.reset_cooldown(ctx)
+
     if isinstance(error,commands.CommandInvokeError):
         if isinstance(error.original,asyncio.TimeoutError):
-            await ctx.reply(f"{client.emotes['failed']} | Command Timed Out!")
+            return await ctx.reply(f"{client.emotes['failed']} | Command Timed Out!")
 
     if isinstance(error, commands.CommandNotFound):
         return
     
     if isinstance(error, commands.MissingRequiredArgument):
         if ctx.command.parent is None:
-            await ctx.invoke(client.get_command('help'), ctx.command.name)
+            return await ctx.invoke(client.get_command('help'), ctx.command.name)
         else:
-            await ctx.invoke(client.get_command('help'),ctx.command.parent.name, ctx.command.name)
+            return await ctx.invoke(client.get_command('help'),ctx.command.parent.name, ctx.command.name)
 
     if isinstance(error, commands.CommandOnCooldown):
         now = datetime.now()
         now = datetime.timestamp(now)
         reply = await ctx.reply(f"{client.emotes['failed']} | Command On Cooldown! Try again <t:{int(now+error.retry_after)}:R> !")
         await asyncio.sleep(error.retry_after)
-        await reply.delete()
+        if reply: return await reply.delete()
 
     if isinstance(error, commands.MissingPermissions):
         err = str(error).replace('You are missing ','').replace(' permission(s) to run this command.','')
-        await ctx.reply(f"{client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
+        return await ctx.reply(f"{client.emotes['failed']} | You Don't Have `{err}` Permission To Use This Command!")
 
     if isinstance(error, commands.BotMissingPermissions):
         err = str(error).replace('Bot requires ','').replace(' permission(s) to run this command.', '')
-        await ctx.reply(f"{client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
+        return await ctx.reply(f"{client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
+    
+    target_channel = client.get_channel(client.config["error_logs"])
+    if target_channel: await target_channel.send(f'```{error}```')
 
 @client.event
 async def on_guild_join(guild):
@@ -115,7 +120,7 @@ async def load():
     for folder in os.listdir("./cogs"):
         for filename in os.listdir(f'./cogs/{folder}'):
             if filename.endswith(".py"):
-                file = await client.load_extension(f"cogs.{folder}.{filename[:-3]}")
+                await client.load_extension(f"cogs.{folder}.{filename[:-3]}")
                 print(f"✅ | {filename[:-3]} Is Loaded!")
 
 async def main():
