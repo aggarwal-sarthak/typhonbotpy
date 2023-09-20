@@ -28,6 +28,7 @@ class settings(commands.Cog):
             if(folder == "Developer"): continue
             enabled_command += f"`{'`, `'.join([filename[:-3] for filename in os.listdir(f'./cogs/{folder}') if filename.endswith('.py')])}`"
         embed.add_field(name="Enabled Commands:",value=enabled_command)
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.send(embed=embed)
 
 
