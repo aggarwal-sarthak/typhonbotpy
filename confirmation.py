@@ -7,6 +7,7 @@ class Buttons(discord.ui.View):
     def __init__ (self, ctx, *, timeout=60):
         super().__init__(timeout=timeout)
         self.ctx = ctx
+
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green)
     async def button1_call(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user != self.ctx.author:
@@ -14,6 +15,7 @@ class Buttons(discord.ui.View):
         self.value = "1"
         self.stop()
         await interaction.response.defer()
+
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
     async def button2_call(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user != self.ctx.author:
@@ -21,3 +23,15 @@ class Buttons(discord.ui.View):
         self.value = "2"
         self.stop()
         await interaction.response.defer()
+
+class Disabled(discord.ui.View):
+    def __init__ (self, ctx, *, timeout=None):
+        super().__init__(timeout=timeout)
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.green, disabled=True)
+    async def button1_call(self, interaction: discord.Interaction, button: discord.Button):
+        pass
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, disabled=True)
+    async def button2_call(self, interaction: discord.Interaction, button: discord.Button):
+        pass
