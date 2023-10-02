@@ -174,7 +174,7 @@ class role(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def add(self, ctx, *ids):
-        pass
+        await parse_ids(self, ctx, ids, 'add')
 
     @add.command(name='all', description='Manages All Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add all")
     @commands.has_permissions(manage_roles=True)
@@ -206,8 +206,8 @@ class role(commands.Cog):
     @role.group(name='remove', description='Removes Role(s) From Members', aliases = ['take', 'r'], usage = f"{os.path.basename(__file__)[:-3]} remove <subcommand>", invoke_without_command=True)
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
-    async def remove(self, ctx, cmd):
-        pass
+    async def remove(self, ctx, *ids):
+        await parse_ids(self, ctx, ids, 'remove')
 
     @remove.command(name='all', description='Manages All Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove all")
     @commands.has_permissions(manage_roles=True)
@@ -286,21 +286,28 @@ async def confirm(self, ctx, members, mode):
         
 async def parse_ids(self, ctx, ids, mode):
     mem_dict = {}
-    for id in ids:
-        if id.isnumeric():
-            member = discord.utils.get(ctx.guild.members, id = int(id))
+    members = []
+    roles = []
+    for i in ids:
+        if i.isnumeric():
+            id = int(i)
         else:
-            member = discord.utils.get(ctx.guild.members, id = int(id.id))
-    # parsed_ids = []
-    # for id in ids:
-    #     if "<@&" in id:
-    #         parsed_ids.append(id[id.index("<@&")+3:id.index(">")])
+            id = int(i.strip('<@!&>'))
 
-    #     elif "<@" in id:
-    #         parsed_ids.append(id[id.index("<@")+2:id.index(">")])
+        member = ctx.guild.get_member(id)
+        if member:
+            members.append(id)
+        role = ctx.guild.get_role(id)
+        if role:
+            roles.append(id)
 
-    #     elif id.isdigit():
-    #         parsed_ids.append(id)
+    if mode == 'add':
+        for r in roles:
+            mem_dict[r] = [m for m in members if ctx.guild.get_role(r) not in ctx.guild.get_member(m).roles]
+    elif mode == 'remove':
+        for r in roles:
+            mem_dict[r] = [m for m in members if ctx.guild.get_role(r) in ctx.guild.get_member(m).roles]
+    await confirm(self, ctx, mem_dict, mode)
 
 async def setup(client):
     await client.add_cog(role(client))
