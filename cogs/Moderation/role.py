@@ -96,8 +96,7 @@ async def action(self, ctx, members, msg, mode):
     for i in dict:
         desc += f'{self.client.emotes["success"]} | **Role:** `{i}`, **Success:** `{dict[i][0]}`, **Failed:** `{dict[i][1]}`\n'
     
-    if msg: await msg.delete()
-    await ctx.reply(desc)
+    if msg: await msg.edit(content=desc)
 
 async def confirm(self, ctx, members, mode):
     if not members: raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name="ids"))
@@ -121,21 +120,21 @@ async def confirm(self, ctx, members, mode):
     embed = discord.Embed(title=title,description=desc,color=0xfb7c04)
 
     msg = await ctx.reply(embed=embed,view=view)
-    try:
-        await view.wait()
-        if view.value == '1':
-            if msg: await msg.delete()
-            msg = await ctx.reply(f'{self.client.emotes["loading"]} | Command Executing...!')
-            await action(self, ctx, members, msg, mode)
-
-        if view.value == '2':
-            if msg: await msg.delete()
-            await ctx.reply(f'{self.client.emotes["failed"]} | Command Cancelled!')
-            
-        await self.mem_dict.clear()
-    except:
+    await view.wait()
+    if not view.value:
         disable = confirmation.Disabled(ctx)
-        await msg.edit(embed=embed, view=disable)
+        return await msg.edit(embed=embed, view=disable)
+
+    elif view.value == '1':
+        if msg: await msg.delete()
+        msg = await ctx.reply(f'{self.client.emotes["loading"]} | Command Executing...!')
+        await action(self, ctx, members, msg, mode)
+
+    elif view.value == '2':
+        if msg: await msg.delete()
+        await ctx.reply(f'{self.client.emotes["failed"]} | Command Cancelled!')
+        
+    self.mem_dict = {}
         
 async def parse_ids(self, ctx, ids, mode):
     mem_dict = {}

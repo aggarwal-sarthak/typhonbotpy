@@ -9,7 +9,7 @@ class list(commands.Cog):
         self.client = client
         self.embeds = []
 
-    @commands.group(name='list', description='Returns List of Members', usage=f'{os.path.basename(__file__)[:-3]} <role>', aliases=['dump', 'inrole'], invoke_without_command=True)
+    @commands.group(name='list', description='Returns List of Members', usage=f'{os.path.basename(__file__)[:-3]} <role>', aliases=['dump'], invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
@@ -81,6 +81,22 @@ class list(commands.Cog):
             self.embeds.append(pagination_embed)
         await pagination_check(self, ctx, data, self.embeds)
 
+    @list.command(name='vc', description='Returns List of Voice Channels', aliases=['vcs', 'voice'])
+    @commands.has_permissions(administrator=True)
+    @commands.bot_has_permissions(embed_links=True)
+    async def vc(self, ctx):
+        data = [chan for chan in ctx.guild.voice_channels]
+        title = f"Voice Channels : {len(data)}"
+        await mention_pagination(self, ctx, data, self.embeds, title)
+
+    @list.command(name='text', description='Returns List of Text Channels', aliases=['texts'])
+    @commands.has_permissions(administrator=True)
+    @commands.bot_has_permissions(embed_links=True)
+    async def text(self, ctx):
+        data = [chan for chan in ctx.guild.text_channels]
+        title = f"Text Channels : {len(data)}"
+        await mention_pagination(self, ctx, data, self.embeds, title)
+
 async def mention_pagination(self, ctx, data, embeds, title):
     for i in range(0,len(data), 20):
         description = ""
@@ -98,7 +114,7 @@ async def pagination_check(self,ctx,data,embeds):
         await ctx.reply(embed=embeds[0])
     else:
         await ctx.reply(f"{self.client.emotes['failed']} | No Members To Show!")
-    await self.embeds.clear()
+    self.embeds = []
 
 async def setup(client):
     await client.add_cog(list(client))

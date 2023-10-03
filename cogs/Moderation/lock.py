@@ -38,5 +38,31 @@ class lock(commands.Cog):
                 count += 1
         if msg: await msg.edit(content=f'{self.client.emotes["success"]} | `{count}` Channels Are Locked!')
 
+    @lock.command(name='text', description='Locks All Text Channel(s) For Everyone', aliases=['texts'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.has_permissions(manage_channels=True)
+    @commands.bot_has_permissions(manage_channels=True)
+    async def text(self, ctx):
+        count = 0
+        msg = await ctx.reply(f'{self.client.emotes["loading"]} | Locking Text Channels!')
+        for c in ctx.guild.text_channels:
+            perms = c.overwrites_for(ctx.guild.default_role)
+            perms.send_messages=False
+            await c.set_permissions(ctx.guild.default_role, overwrite=perms)
+            count += 1
+        if msg: await msg.edit(content=f'{self.client.emotes["success"]} | `{count}` Text Channels Locked!')
+
+    @lock.command(name='voice', description='Locks All Voice Channel(s) For Everyone', aliases=['vc','vcs'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.has_permissions(manage_channels=True)
+    @commands.bot_has_permissions(manage_channels=True)
+    async def text(self, ctx):
+        count = 0
+        msg = await ctx.reply(f'{self.client.emotes["loading"]} | Locking Voice Channels!')
+        for c in ctx.guild.voice_channels:
+            perms = c.overwrites_for(ctx.guild.default_role)
+            perms.send_messages=False
+            await c.set_permissions(ctx.guild.default_role, overwrite=perms)
+            count += 1
+        if msg: await msg.edit(content=f'{self.client.emotes["success"]} | `{count}` Voice Channels Locked!')
+
 async def setup(client):
     await client.add_cog(lock(client))
