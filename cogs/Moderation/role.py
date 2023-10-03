@@ -101,6 +101,15 @@ async def action(self, ctx, members, msg, mode):
 
 async def confirm(self, ctx, members, mode):
     if not members: raise commands.MissingRequiredArgument(SimpleNamespace(displayed_name="ids"))
+    
+    for role in members:
+        role = ctx.guild.get_role(role)
+        if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
+            return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Assign The Role `{role.name}`!")
+
+        elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
+            return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Assign The Role `{role.name}`!")
+
     desc = ''
     for i in members:
         desc += f'**Role:** `{ctx.guild.get_role(i).name}`, **Members:** `{len(members[i])}`\n'
