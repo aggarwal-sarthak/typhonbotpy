@@ -6,18 +6,30 @@ from discord.ext import commands
 from discord.ui import Item, Select, select, Button, button, View, ChannelSelect, Modal, TextInput
 from contextlib import suppress
 import confirmation
+import json
+import os
 from validation import is_command_enabled
+
+with open('emoji.json', 'r') as f:
+    emotes = json.load(f)
 
 class announce(commands.Cog):
     def __init__(self, client):
         self.client = client
-    @commands.command()
+
+    @commands.command(description='Custom Embed Builder',aliases = ['embed'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.has_guild_permissions(administrator=True)
+    @commands.bot_has_guild_permissions(administrator=True)
+    @commands.cooldown(1, 60, commands.BucketType.guild)
     async def announce(self,ctx):
+        global author
+        author = ctx.author
         try:
             view = EmbedCreator(bot=self.client)
             await ctx.send(embed=view.get_default_embed, view=view)
         except Exception as e:
-            print("/n/n/n",e)
+            pass
 
 class ChannelSelectPrompt(View):
     """
@@ -147,6 +159,9 @@ class CreatorMethods:
 
     async def edit_author(self, interaction: Interaction) -> None:
         """This method edits the embed's author"""
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Author")
         modal.add_item(
             TextInput(
@@ -188,6 +203,9 @@ class CreatorMethods:
 
     async def edit_message(self, interaction: Interaction) -> None:
         """This method edits the embed's message (discord.Embed.title and discord.Embed.description)"""
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Message")
         modal.add_item(
             TextInput(
@@ -216,6 +234,9 @@ class CreatorMethods:
 
     async def edit_thumbnail(self, interaction: Interaction) -> None:
         """This method edits the embed's thumbnail"""
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Thumbnail")
         modal.add_item(
             TextInput(
@@ -231,6 +252,9 @@ class CreatorMethods:
 
     async def edit_image(self, interaction: Interaction) -> None:
         """This method edits the embed's image"""
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Thumbnail")
         modal.add_item(
             TextInput(
@@ -246,6 +270,9 @@ class CreatorMethods:
 
     async def edit_footer(self, interaction: Interaction) -> None:
         """This method edits the embed's footer (text, icon_url)"""
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Footer")
         modal.add_item(
             TextInput(
@@ -272,6 +299,9 @@ class CreatorMethods:
 
     async def edit_colour(self, interaction: Interaction) -> None:
         """This method is edits the embed's colour"""
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Colour")
         modal.add_item(
             TextInput(
@@ -292,6 +322,9 @@ class CreatorMethods:
             self.embed.color = colour
 
     async def add_field(self, interaction: Interaction) -> None:
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         if len(self.embed.fields) >= 25:
             return await interaction.response.send_message(
                 "You can not add more than 25 fields.", ephemeral=True
@@ -336,6 +369,9 @@ class CreatorMethods:
             )
 
     async def remove_field(self, interaction: Interaction) -> None:
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         if not self.embed.fields:
             return await interaction.response.send_message("There is no fields to remove.", ephemeral=True)
         field_options = list()
@@ -517,6 +553,9 @@ class EmbedCreator(View):
             interaction (discord.Interaction): The interaction object representing the current interaction.
             button (discord.Button): The button object representing the "send" button.
         """
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         prompt = ChannelSelectPrompt(
             "Select a channel to send this embed...", True, 1)
         await interaction.response.send_message(view=prompt, ephemeral=True)
@@ -536,9 +575,11 @@ class EmbedCreator(View):
             interaction (Interaction): The interaction object representing the current interaction.
             button (Button): The button object representing the "cancel" button.
         """
+        if interaction.user != author:
+            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.defer()
         await interaction.message.delete()  # type: ignore
         self.stop()
 
 async def setup(client):
     await client.add_cog(announce(client)) 
-
