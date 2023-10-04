@@ -5,7 +5,6 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 from discord.ui import Item, Select, select, Button, button, View, ChannelSelect, Modal, TextInput
 from contextlib import suppress
-import confirmation
 import json
 import os
 from validation import is_command_enabled
