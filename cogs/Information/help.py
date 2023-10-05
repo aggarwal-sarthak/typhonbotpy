@@ -26,27 +26,26 @@ class help(commands.Cog):
             embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             return await ctx.reply(embed=embed)
             
-        cmd = self.client.get_command(arg[0].lower())
-        if cmd is None: return
-        
-        if(len(arg)>1):
+        if(len(arg)>0):
+            cmd = self.client.get_command(arg[0].lower())
+            if cmd is None:
+                return await ctx.reply(f"{self.client.emotes['failed']} | Command not Found!")
+        if(len(arg)>1 and isinstance(cmd,commands.Group)):
             subcmd = cmd.get_command(arg[1].lower())
             if(subcmd is not None):
                 cmd = subcmd
+        if(len(arg)>2 and isinstance(cmd,commands.Group)):
+            subcmd = cmd.get_command(arg[2].lower())
+            if(subcmd is not None):
+                cmd = subcmd
 
-        embed = discord.Embed(title="Command Details",color=0xfb7c04, description=f"```- [] = Optional Arguments\n- <> = Required Arguments\n- Do Not Type These When Using Commands!```\n> {cmd.description}")
-        if (cmd.aliases):
-            aliases = '`, `'.join([c for c in cmd.aliases])
-            embed.add_field(name="Aliases", value=f"`{aliases}`")
-
-        if(cmd.usage):
-            usage = (prefix+cmd.usage).replace('\n',f'\n{prefix}')
-            embed.add_field(name="Usage", value=f'`{usage}`',inline=False)
-
-        if isinstance(cmd,commands.Group):
-            embed.add_field(name="Subcommands", value=f'`{", ".join([c.name for c in cmd.commands])}`',inline=False)
-
-        embed.add_field(name="Cooldown", value=f'`{str(int(cmd.cooldown.per))+"s" if cmd.cooldown is not None else "No Cooldown!"}`',inline=False)
+        desc = f'**Description:** `{cmd.description if cmd.description else "None"}`\n**Usage:** `{prefix}{cmd.usage if cmd.usage else "None"}`\n**Aliases:** `{"`, `".join([c for c in cmd.aliases]) if cmd.aliases else "None"}`\n**Cooldown:** `{str(int(cmd.cooldown.per))+"s" if cmd.cooldown is not None else "None"}`'
+        if isinstance(cmd, commands.Group):
+            subs= ''
+            for name in cmd.commands:
+                subs += f'`{prefix}{name}`\n'
+            desc += f'\n\n**Subcommands:**\n{subs}'
+        embed = discord.Embed(title=f"Command: {cmd.name}",color=0xfb7c04, description=desc)
         await ctx.reply(embed=embed)
 
 async def setup(client):

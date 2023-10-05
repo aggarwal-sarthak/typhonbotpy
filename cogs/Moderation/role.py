@@ -23,7 +23,7 @@ class role(commands.Cog):
     async def add(self, ctx, *ids):
         await parse_ids(self, ctx, ids, 'add')
 
-    @add.command(name='all', description='Manages All Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add all")
+    @add.command(name='all', description='Add Role To All Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add all")
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def add_all(self, ctx, *ids: discord.Role):
@@ -31,7 +31,7 @@ class role(commands.Cog):
             self.mem_dict[i.id] = [m.id for m in ctx.guild.members if not i in m.roles]
         await confirm(self, ctx, self.mem_dict, 'add')
 
-    @add.command(name='humans', description='Manages Human Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add humans")
+    @add.command(name='humans', description='Add Role To Human Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add humans")
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def add_humans(self, ctx, *ids: discord.Role):
@@ -39,7 +39,7 @@ class role(commands.Cog):
             self.mem_dict[i.id] = [m.id for m in ctx.guild.members if not i in m.roles and not m.bot]
         await confirm(self, ctx, self.mem_dict, 'add')
 
-    @add.command(name='bots', description='Manages Bot Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add bots")
+    @add.command(name='bots', description='Add Role To Bot Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} add bots")
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def add_bots(self, ctx, *ids: discord.Role):
@@ -53,7 +53,7 @@ class role(commands.Cog):
     async def remove(self, ctx, *ids):
         await parse_ids(self, ctx, ids, 'remove')
 
-    @remove.command(name='all', description='Manages All Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove all")
+    @remove.command(name='all', description='Remove Role From All Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove all")
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def remove_all(self, ctx, *ids: discord.Role):
@@ -61,7 +61,7 @@ class role(commands.Cog):
             self.mem_dict[i.id] = [m.id for m in ctx.guild.members if i in m.roles]
         await confirm(self, ctx, self.mem_dict, 'remove')
 
-    @remove.command(name='humans', description='Manages Human Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove humans")
+    @remove.command(name='humans', description='Remove Role From Human Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove humans")
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def remove_humans(self, ctx, *ids: discord.Role):
@@ -69,7 +69,7 @@ class role(commands.Cog):
             self.mem_dict[i.id] = [m.id for m in ctx.guild.members if i in m.roles and not m.bot]
         await confirm(self, ctx, self.mem_dict, 'remove')
 
-    @remove.command(name='bots', description='Manages Bot Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove bots")
+    @remove.command(name='bots', description='Remove Role From Bot Members Of Server', usage = f"{os.path.basename(__file__)[:-3]} remove bots")
     @commands.has_permissions(manage_roles=True)
     @commands.bot_has_permissions(manage_roles=True)
     async def remove_bots(self, ctx, *ids: discord.Role):

@@ -9,7 +9,7 @@ class list(commands.Cog):
         self.client = client
         self.embeds = []
 
-    @commands.group(name='list', description='Returns List of Members', usage=f'{os.path.basename(__file__)[:-3]} <role>', aliases=['dump'], invoke_without_command=True)
+    @commands.group(name='list', description='Returns List', usage=f'{os.path.basename(__file__)[:-3]} <subcommand>', aliases=['dump'], invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(embed_links=True)
