@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import os
 import confirmation
+import re
 from types import SimpleNamespace
 from validation import is_command_enabled
 
@@ -117,7 +118,7 @@ async def confirm(self, ctx, members, mode):
     elif mode == 'remove': title = 'Do You Want To Remove Roles?'
 
     view = confirmation.Buttons(ctx)
-    embed = discord.Embed(title=title,description=desc,color=0xfb7c04)
+    embed = discord.Embed(title=title,description=desc,color=self.client.config['color'])
 
     msg = await ctx.reply(embed=embed,view=view)
     await view.wait()
@@ -140,12 +141,11 @@ async def parse_ids(self, ctx, ids, mode):
     mem_dict = {}
     members = []
     roles = []
-    for i in ids:
-        if i.isnumeric():
-            id = int(i)
-        else:
-            id = int(i.strip('<@!&>'))
+    matches = re.findall(r'\d+', str(ids))
 
+    ids = [int(match) for match in matches]
+
+    for id in ids:
         member = ctx.guild.get_member(id)
         if member:
             members.append(id)

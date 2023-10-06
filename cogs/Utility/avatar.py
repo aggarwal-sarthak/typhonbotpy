@@ -12,7 +12,7 @@ class avatar(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def avatar(self, ctx, member: discord.Member=None):
         if not member: member = ctx.author
-        embed = discord.Embed(title=f"{member}'s Avatar",color=0xfb7c04)
+        embed = discord.Embed(title=f"{member}'s Avatar",color=self.client.config['color'])
         embed.set_image(url=member.display_avatar)
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)

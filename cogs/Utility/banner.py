@@ -13,7 +13,7 @@ class banner(commands.Cog):
     async def banner(self, ctx, member: discord.Member=None):
         if not member: member = ctx.author
         try:
-            embed = discord.Embed(title=f"{member}'s Banner",color=0xfb7c04)
+            embed = discord.Embed(title=f"{member}'s Banner",color=self.client.config['color'])
             user = await self.client.fetch_user(member.id)
             banner_url = user.banner.url
             embed.set_image(url=banner_url)
@@ -26,7 +26,7 @@ class banner(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     async def server(self, ctx):
         if ctx.guild.banner :
-            embed = discord.Embed(title=f"{ctx.guild}'s Banner",color=0xfb7c04)
+            embed = discord.Embed(title=f"{ctx.guild}'s Banner",color=self.client.config['color'])
             embed.set_image(url=ctx.guild.banner)
             embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             await ctx.reply(embed=embed)

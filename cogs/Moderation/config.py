@@ -18,7 +18,7 @@ class config(commands.Cog):
             prefix = guild['prefix']
         else:
             prefix = self.client.config['prefix']
-        embed = discord.Embed(title="Server Configuration",color=0xfb7c04)
+        embed = discord.Embed(title="Server Configuration",color=self.client.config['color'])
         embed.add_field(name="Prefix:",value=f"`{prefix}`")
         embed.add_field(name="Disabled Commands:",value=f"`{'`,`'.join([cmd for cmd in guild['cmds']]) if guild and len(guild['cmds'])>0 else 'None'}`",inline=False)
         # enabled_command = ""

@@ -36,7 +36,7 @@ class userinfo(commands.Cog):
         elif "Manage Guild" in permission_list: ack = "Server Moderator"
         else: ack = "Server Member"
 
-        embed = discord.Embed(title=None,color=0xfb7c04)
+        embed = discord.Embed(title=None,color=self.client.config['color'])
         badges = member.public_flags.all()
         badge_text=""
         for badge in badges:

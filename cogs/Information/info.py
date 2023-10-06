@@ -17,7 +17,7 @@ class info(commands.Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.check(is_command_enabled)
     async def info(self, ctx):
-        embed = discord.Embed(title=f'{self.client.user.name}',color=0xfb7c04)
+        embed = discord.Embed(title=f'{self.client.user.name}',color=self.client.config['color'])
         embed.add_field(name="Discord.py",value=discord.__version__,inline=False)
         embed.add_field(name="Owner",value=f"[{await self.client.fetch_user(self.client.config['owner'][0])}](https://discord.com/users/{self.client.config['owner'][0]}) [<@!{self.client.config['owner'][0]}>]\n[{await self.client.fetch_user(self.client.config['owner'][1])}](https://discord.com/users/{self.client.config['owner'][1]}) [<@!{self.client.config['owner'][1]}>]",inline=False)
         embed.add_field(name="Total Servers",value=len(self.client.guilds),inline=False)

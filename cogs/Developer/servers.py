@@ -19,7 +19,7 @@ class servers(commands.Cog):
             description = ""
             for j in range(i, min(i+20, len(data))):
                 description += f'**{str(j+1)}.** {str(data[j].name)} **|** {str(data[j].id)} **|** {str(data[j].member_count)}\n'
-            pagination_embed = discord.Embed(title=f'Bot Servers [{len(self.client.guilds)}]', description=description,color=0xfb7c04)
+            pagination_embed = discord.Embed(title=f'Bot Servers [{len(self.client.guilds)}]', description=description,color=self.client.config['color'])
             pagination_embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             embeds.append(pagination_embed)
         await pagination_check(self, ctx, data, embeds)

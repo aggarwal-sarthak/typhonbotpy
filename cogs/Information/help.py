@@ -18,10 +18,10 @@ class help(commands.Cog):
             prefix = self.client.config['prefix']
 
         if not arg:
-            embed = discord.Embed(color=0xfb7c04)
+            embed = discord.Embed(color=self.client.config['color'])
             embed.add_field(name="",value=f"[Invite Me](https://discord.com/api/oauth2/authorize?client_id=756052319417925633&permissions=8&redirect_uri=https%3A%2F%2Fdiscord.com%2Finvite%2F5UqVvZj&response_type=code&scope=bot%20guilds.join%20applications.commands) **|** [Support Server](https://discord.com/invite/5UqVvZj) **|** [Vote Me](https://top.gg/bot/756052319417925633/vote)",inline=False)
             for folder in os.listdir('./cogs'):
-                if(folder == "Developer"): continue
+                if(ctx.author.id not in self.client.config['owner'] and folder == "Developer"): continue
                 embed.add_field(name=f"{folder}",value=f"`{'`, `'.join([filename[:-3] for filename in os.listdir(f'./cogs/{folder}') if filename.endswith('.py')])}`",inline=False)
             embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             return await ctx.reply(embed=embed)
@@ -45,7 +45,7 @@ class help(commands.Cog):
             for name in cmd.commands:
                 subs += f'`{prefix}{name}`\n'
             desc += f'\n\n**Subcommands:**\n{subs}'
-        embed = discord.Embed(title=f"Command: {cmd.name}",color=0xfb7c04, description=desc)
+        embed = discord.Embed(title=f"Command: {cmd.name}",color=self.client.config['color'], description=desc)
         await ctx.reply(embed=embed)
 
 async def setup(client):

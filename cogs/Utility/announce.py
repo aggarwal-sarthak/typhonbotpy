@@ -11,6 +11,8 @@ from validation import is_command_enabled
 
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
 class announce(commands.Cog):
     def __init__(self, client):
@@ -521,7 +523,7 @@ class EmbedCreator(View):
             embed (discord.Embed)
         """
         embed = Embed(title=None,
-                      description="Select Options from the Drop down menu!", colour=0xfb7c04)
+                      description="Select Options from the Drop down menu!", colour=config['color'])
         return embed
 
     @select(placeholder="Edit a section")

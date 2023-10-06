@@ -12,7 +12,7 @@ class evaluate(commands.Cog):
         if ctx.author.id not in self.client.config["owner"]: return
         try:
             result = eval(code)
-            await ctx.send(f"{self.client.emotes['success']} | Result: {result}")
+            await ctx.send(f"{self.client.emotes['success']} | **Result:** {result}")
 
         except Exception as e:
             await ctx.send(f"{self.client.emotes['failed']} | Error: {e}")

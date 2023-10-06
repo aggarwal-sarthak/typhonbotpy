@@ -60,7 +60,7 @@ class list(commands.Cog):
             description = ""
             for j in range(i, min(i+20, len(data))):
                 description += f"**{str(j+1)}** : {data[j]} : `{data[j].name}`\n"
-            pagination_embed = discord.Embed(title=title, description=description,color=0xfb7c04)
+            pagination_embed = discord.Embed(title=title, description=description,color=self.client.config['color'])
             pagination_embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             self.embeds.append(pagination_embed)
         await pagination_check(self, ctx, data, self.embeds)
@@ -76,7 +76,7 @@ class list(commands.Cog):
             description = ""
             for j in range(i, min(i+20, len(data))):
                 description += "**" + str(j+1) + "** : " + str(data[j].mention) + " `" + str(data[j].id) + "`" + "\n"
-            pagination_embed = discord.Embed(title=title, description=description,color=0xfb7c04)
+            pagination_embed = discord.Embed(title=title, description=description,color=self.client.config['color'])
             pagination_embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             self.embeds.append(pagination_embed)
         await pagination_check(self, ctx, data, self.embeds)
@@ -102,7 +102,7 @@ async def mention_pagination(self, ctx, data, embeds, title):
         description = ""
         for j in range(i, min(i+20, len(data))):
             description += "**" + str(j+1) + "** : " +  str(data[j]) + " [" + str(data[j].mention) + "]" + "\n"
-        pagination_embed = discord.Embed(title=title, description=description,color=0xfb7c04)
+        pagination_embed = discord.Embed(title=title, description=description,color=self.client.config['color'])
         pagination_embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         embeds.append(pagination_embed)
     await pagination_check(self,ctx,data, embeds)
