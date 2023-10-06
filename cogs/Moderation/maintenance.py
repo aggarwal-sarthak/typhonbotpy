@@ -12,7 +12,7 @@ class maintenance(commands.Cog):
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(manage_channels=True)
-    async def maintenance(self, ctx):
+    async def maintenance(self, ctx, mode):
         pass
 
     @maintenance.command(name='on', description='Enables Maintenance Mode For Server', usage=f"{os.path.basename(__file__)[:-3]} on [role]", aliases=['enable'])

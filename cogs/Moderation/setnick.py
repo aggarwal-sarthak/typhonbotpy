@@ -13,9 +13,10 @@ class setnick(commands.Cog):
     @commands.bot_has_permissions(manage_nicknames=True)
     async def setnick(self, ctx, member:discord.Member, *nickname):
         if ctx.guild.owner_id == member.id or ctx.guild.get_member(self.client.user.id).top_role.position <= member.top_role.position:
-            await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Change `{member.name}`'s Nickname!")
+            return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Change `{member.name}`'s Nickname!")
+
         elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= member.top_role.position:
-            await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Change `{member.name}`'s Nickname!")
+            return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Change `{member.name}`'s Nickname!")
         
         if not nickname:
             await member.edit(nick=None)

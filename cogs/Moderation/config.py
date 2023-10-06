@@ -2,17 +2,17 @@ import discord
 from discord.ext import commands
 import os 
 
-class settings(commands.Cog):
+class config(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name = "settings",
+    @commands.command(name = "config",
                     usage=f"{os.path.basename(__file__)[:-3]}",
                     description = "Shows the Bot configuration for the server",
-                    aliases=["configuration","config","setting"])
+                    aliases=["configuration","settings","setting"])
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 2, commands.BucketType.member)
-    async def settings(self, ctx:commands.Context):
+    async def config(self, ctx:commands.Context):
         guild = self.client.db.guilds.find_one({"guild_id":ctx.guild.id})
         if guild and "prefix" in guild:
             prefix = guild['prefix']
@@ -31,4 +31,4 @@ class settings(commands.Cog):
         await ctx.reply(embed=embed)
 
 async def setup(client):
-    await client.add_cog(settings(client))
+    await client.add_cog(config(client))

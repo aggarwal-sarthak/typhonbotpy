@@ -24,7 +24,12 @@ class kick(commands.Cog):
         if(user==ctx.guild.owner):
             return await ctx.reply(f"{self.client.emotes['failed']} | Cannot Kick the Owner!")
             
-        await position_check(self,ctx,role)
+        if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
+            return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Kick!")
+
+        elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
+            return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Kick!")
+        
         msg = await ctx.reply(f"You are about to kick: <@{user.id}>",view=view)
         await view.wait()
 
@@ -39,10 +44,3 @@ class kick(commands.Cog):
 
 async def setup(client):
     await client.add_cog(kick(client))   
-
-async def position_check(self, ctx, role):
-    if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
-        return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Kick!")
-
-    elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
-        return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Kick!")

@@ -24,7 +24,12 @@ class ban(commands.Cog):
         if(user == ctx.guild.owner):
             return await ctx.reply(f"{self.client.emotes['failed']} | Cannot Ban the Owner!")
             
-        await position_check(self,ctx,role)
+        if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
+            return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Ban!")
+
+        elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
+            return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Ban!")
+        
         msg = await ctx.reply(f"You Are About To Ban: {user}",view=view)
         await view.wait()
         if view.value == "1":
@@ -37,11 +42,4 @@ class ban(commands.Cog):
             return await ctx.reply(f"{self.client.emotes['success']} | Ban Cancelled Successfully!")
 
 async def setup(client):
-    await client.add_cog(ban(client))   
-
-async def position_check(self, ctx, role):
-    if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
-        return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Ban!")
-
-    elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
-        return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Ban!")
+    await client.add_cog(ban(client))       
