@@ -28,21 +28,25 @@ class maintenance(commands.Cog):
         view = confirmation.Buttons(ctx)
         msg = await ctx.reply(f'Enable Maintenance Mode: `{role}`?', view=view)
         await view.wait()
+        
+        try:
+            if view.value == "1":
+                if msg: await msg.delete()
+                msg = await ctx.reply(f'{self.client.emotes["loading"]} | Enabling Maintenance Mode: `{role}`!')
 
-        if view.value == "1":
-            if msg: await msg.delete()
-            msg = await ctx.reply(f'{self.client.emotes["loading"]} | Enabling Maintenance Mode: `{role}`!')
-
-            for channel in ctx.guild.channels:
-                if not isinstance(channel, discord.CategoryChannel):
-                    perms = channel.overwrites_for(role)
-                    perms.view_channel = False
-                    await channel.set_permissions(role, overwrite=perms)
-            if msg: return await msg.edit(content=f'{self.client.emotes["success"]} | Maintenance Mode Enabled: `{role}`!')
-            
-        if view.value == "2":
-            if msg: await msg.delete()
-            return await ctx.reply(f"{self.client.emotes['success']} | Maintenance Cancelled Successfully!")
+                for channel in ctx.guild.channels:
+                    if not isinstance(channel, discord.CategoryChannel):
+                        perms = channel.overwrites_for(role)
+                        perms.view_channel = False
+                        await channel.set_permissions(role, overwrite=perms)
+                if msg: return await msg.edit(content=f'{self.client.emotes["success"]} | Maintenance Mode Enabled: `{role}`!')
+                
+            if view.value == "2":
+                if msg: await msg.delete()
+                return await ctx.reply(f"{self.client.emotes['success']} | Maintenance Cancelled Successfully!")
+        except:
+            disable = confirmation.Disabled(ctx)
+            return await msg.edit(content=f'Enable Maintenance Mode: `{role}`?',view=disable)
 
     @maintenance.command(name='off', description='Disables Maintenance Mode For Server', usage=f"{os.path.basename(__file__)[:-3]} off [role]", aliases=['disable'])
     @commands.has_permissions(administrator=True)

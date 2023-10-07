@@ -122,19 +122,20 @@ async def confirm(self, ctx, members, mode):
 
     msg = await ctx.reply(embed=embed,view=view)
     await view.wait()
-    if not view.value:
+
+    try:
+        if view.value == '1':
+            if msg: await msg.delete()
+            msg = await ctx.reply(f'{self.client.emotes["loading"]} | Command Executing...!')
+            await action(self, ctx, members, msg, mode)
+
+        elif view.value == '2':
+            if msg: await msg.delete()
+            await ctx.reply(f'{self.client.emotes["failed"]} | Command Cancelled!')
+    except:
         disable = confirmation.Disabled(ctx)
         return await msg.edit(embed=embed, view=disable)
-
-    elif view.value == '1':
-        if msg: await msg.delete()
-        msg = await ctx.reply(f'{self.client.emotes["loading"]} | Command Executing...!')
-        await action(self, ctx, members, msg, mode)
-
-    elif view.value == '2':
-        if msg: await msg.delete()
-        await ctx.reply(f'{self.client.emotes["failed"]} | Command Cancelled!')
-        
+    
     self.mem_dict = {}
         
 async def parse_ids(self, ctx, ids, mode):

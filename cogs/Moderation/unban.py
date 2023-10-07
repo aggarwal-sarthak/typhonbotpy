@@ -24,17 +24,21 @@ class unban(commands.Cog):
         view = confirmation.Buttons(ctx)
         user = await self.client.fetch_user(user)
 
-        msg = await ctx.reply(f"You Are About To Unban: <@{user.id}>",view=view)
+        msg = await ctx.reply(f"You Are About To Unban: `{user}`",view=view)
         await view.wait()
 
-        if view.value == "1":
-            if msg: await msg.delete()
-            await ctx.guild.unban(user=user,reason=reason)
-            return await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> Was Unbanned Successfully!")
- 
-        if view.value == "2":
-            if msg: await msg.delete()
-            return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
+        try:
+            if view.value == "1":
+                if msg: await msg.delete()
+                await ctx.guild.unban(user=user,reason=reason)
+                return await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> Was Unbanned Successfully!")
+    
+            if view.value == "2":
+                if msg: await msg.delete()
+                return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
+        except:
+            disable = confirmation.Disabled(ctx)
+            return await msg.edit(content=f"You Are About To Unban: `{user}`",view=disable)
         
     @unban.command(name='all', description="Unbans Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} all [reason]")
     @commands.has_permissions(administrator=True)
@@ -52,19 +56,23 @@ class unban(commands.Cog):
         msg = await ctx.reply(f"You Are About To Unban: `{len(banned)}` Members",view=view)
         await view.wait()
         
-        if view.value == "1":
-            if msg: await msg.delete()
-            msg = await ctx.reply(f'{self.client.emotes["loading"]} | Unbanning `{len(banned)}` Members!')
+        try:
+            if view.value == "1":
+                if msg: await msg.delete()
+                msg = await ctx.reply(f'{self.client.emotes["loading"]} | Unbanning `{len(banned)}` Members!')
 
-            for user in banned:
-                user = await self.client.fetch_user(user)
-                await ctx.guild.unban(user=user,reason=reason)
-            if msg: await msg.delete()
-            return await ctx.reply(f"{self.client.emotes['success']} | `{len(banned)}` Members Were Unbanned Successfully!")
- 
-        if view.value == "2":
-            if msg: await msg.delete()
-            return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
+                for user in banned:
+                    user = await self.client.fetch_user(user)
+                    await ctx.guild.unban(user=user,reason=reason)
+                if msg: await msg.delete()
+                return await ctx.reply(f"{self.client.emotes['success']} | `{len(banned)}` Members Were Unbanned Successfully!")
+    
+            if view.value == "2":
+                if msg: await msg.delete()
+                return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
+        except:
+            disable = confirmation.Disabled(ctx)
+            return await msg.edit(content=f"You Are About To Unban: `{len(banned)}` Members",view=disable)
 
 async def setup(client):
     await client.add_cog(unban(client))   

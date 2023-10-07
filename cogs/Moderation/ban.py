@@ -30,16 +30,20 @@ class ban(commands.Cog):
         elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
             return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Ban!")
         
-        msg = await ctx.reply(f"You Are About To Ban: {user}",view=view)
+        msg = await ctx.reply(f"You Are About To Ban: `{user}`",view=view)
         await view.wait()
-        if view.value == "1":
-            if msg: await msg.delete()
-            await ctx.guild.ban(user=user,reason=reason,delete_message_seconds=0)
-            return await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> Was Banned successfully!")
+        try:
+            if view.value == "1":
+                if msg: await msg.delete()
+                await ctx.guild.ban(user=user,reason=reason,delete_message_seconds=0)
+                return await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> Was Banned successfully!")
 
-        if view.value == "2":
-            if msg: await msg.delete()
-            return await ctx.reply(f"{self.client.emotes['success']} | Ban Cancelled Successfully!")
+            if view.value == "2":
+                if msg: await msg.delete()
+                return await ctx.reply(f"{self.client.emotes['success']} | Ban Cancelled Successfully!")
+        except:
+            disable = confirmation.Disabled(ctx)
+            return await msg.edit(content=f"You Are About To Ban: `{user}`",view=disable)
 
 async def setup(client):
     await client.add_cog(ban(client))       
