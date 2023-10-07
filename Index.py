@@ -7,6 +7,7 @@ import logging
 import sys
 from datetime import datetime
 from validation import db_client
+import confirmation
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -34,6 +35,36 @@ client.db = db_client.typhonbot
 @client.event
 async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
+
+@client.event
+async def on_command(ctx):
+    if(ctx.author.guild_permissions.administrator):
+        guild_db = client.db.guilds.find_one({"guild_id":ctx.guild.id})
+        if not guild_db:
+            client.db.guilds.insert_one({"guild_id":ctx.guild.id,
+                                            "updated":"False"})  
+        elif 'updated' not in guild_db:
+            guild_db["updated"] = "False"
+            
+        if guild_db['updated'] == "False":
+            client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"updated":"True"}})
+            view = confirmation.Buttons(ctx)
+            msg = await ctx.send(f"{emotes['bot']} | The bot was updated. Click to read the Update Log!",view=view,ephemeral=True)
+            await view.wait()
+            
+            try:
+                if view.value == '1':
+                    if msg: await msg.delete()
+                    embed = discord.Embed.from_dict(client.db.updatelog.find_one({}))
+                    await ctx.send(embed=embed)
+                    target_channel = client.get_channel(config["update_channel"])
+                    if target_channel: await target_channel.send(f"```{ctx.author.name} - {ctx.author.id} in {ctx.guild.name} - {ctx.guild.id}```")
+                    
+                elif view.value == '2':
+                    if msg: await msg.delete()
+            except Exception as e:
+                print(e)
+                
 
 @client.event
 async def on_command_error(ctx, error):
