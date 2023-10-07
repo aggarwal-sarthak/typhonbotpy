@@ -42,12 +42,12 @@ async def on_command(ctx):
         guild_db = client.db.guilds.find_one({"guild_id":ctx.guild.id})
         if not guild_db:
             client.db.guilds.insert_one({"guild_id":ctx.guild.id,
-                                            "updated":"False"})  
+                                            "updated":False})  
         elif 'updated' not in guild_db:
-            guild_db["updated"] = "False"
+            guild_db["updated"] = False
             
-        if guild_db['updated'] == "False":
-            client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"updated":"True"}})
+        if guild_db['updated'] == False:
+            client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"updated":True}})
             view = confirmation.Buttons(ctx)
             msg = await ctx.send(f"{emotes['bot']} | The bot was updated. Click to read the Update Log!",view=view,ephemeral=True)
             await view.wait()

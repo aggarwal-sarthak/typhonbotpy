@@ -550,12 +550,12 @@ class EmbedCreator(View):
             return await interaction.response.defer()
         dict = self.embed.to_dict()
         updateLog = db_client.typhonbot.updatelog
-        if(updateLog):
+        if(updateLog is not None):
             updateLog.delete_many({})
         updateLog.insert_one(dict)
         await interaction.message.delete()
         await interaction.message.channel.send(f"{emotes['success']} | Update Log letter Sent!")
-        db_client.typhonbot.guilds.update_many({},{"$set":{"updated":"False"}})
+        db_client.typhonbot.guilds.update_many({},{"$set":{"updated":False}})
         
     @button()
     async def cancel_callback(self, interaction: Interaction, button: Button) -> None:
