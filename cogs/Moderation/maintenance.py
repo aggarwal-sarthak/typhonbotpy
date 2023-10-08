@@ -8,7 +8,7 @@ class maintenance(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.group(name='maintenance', description='Enables/Disables Maintenance Mode For Server', aliases=['mm', 'mmode'])
+    @commands.group(name='maintenance', description='Enables/Disables Maintenance Mode For Server', aliases=['mm', 'mmode'], invoke_without_command=True)
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.bot_has_permissions(manage_channels=True)

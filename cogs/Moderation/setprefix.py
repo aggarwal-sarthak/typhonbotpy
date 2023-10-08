@@ -6,7 +6,7 @@ class setprefix(commands.Cog):
     def __init__(self, client:commands.Bot):
         self.client = client
 
-    @commands.command(description= "Sets The Mentioned Symbol As Server Prefix", aliases=['set','sp','setpre'], usage=f"{os.path.basename(__file__)[:-3]} <Symbol>" )
+    @commands.command(description= "Sets The Mentioned Symbol As Server Prefix", aliases=['set','sp','setpre','prefix'], usage=f"{os.path.basename(__file__)[:-3]} <Symbol>" )
     @commands.check(is_command_enabled)
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 10, commands.BucketType.guild)

@@ -39,7 +39,7 @@ class help(commands.Cog):
             if(subcmd is not None):
                 cmd = subcmd
 
-        desc = f'**Description:** `{cmd.description if cmd.description else "None"}`\n**Usage:** `{prefix}{cmd.usage if cmd.usage else "None"}`\n**Aliases:** `{"`, `".join([c for c in cmd.aliases]) if cmd.aliases else "None"}`\n**Cooldown:** `{str(int(cmd.cooldown.per))+"s" if cmd.cooldown is not None else "None"}`'
+        desc = f'**Description:** `{cmd.description if cmd.description else "None"}`\n**Usage:** `{cmd.usage if cmd.usage else "None"}`\n**Aliases:** `{"`, `".join([c for c in cmd.aliases]) if cmd.aliases else "None"}`\n**Cooldown:** `{str(int(cmd.cooldown.per))+"s" if cmd.cooldown is not None else "None"}`'
         if isinstance(cmd, commands.Group):
             subs= ''
             for name in cmd.commands:

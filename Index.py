@@ -44,7 +44,7 @@ async def on_command(ctx):
     if not guild_db:
         client.db.guilds.insert_one({"guild_id":ctx.guild.id, "updated":False})
 
-    elif 'updated' not in guild_db:
+    if 'updated' not in guild_db:
         guild_db["updated"] = False
         
     if guild_db['updated'] == False:
@@ -69,6 +69,8 @@ async def on_command(ctx):
                 
 @client.event
 async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound): return
+    
     if not isinstance(error, commands.CommandOnCooldown):
         ctx.command.reset_cooldown(ctx)
 
@@ -76,9 +78,6 @@ async def on_command_error(ctx, error):
         if isinstance(error.original,asyncio.TimeoutError):
             return await ctx.reply(f"{client.emotes['failed']} | Command Timed Out!")
 
-    if isinstance(error, commands.CommandNotFound):
-        return
-    
     if isinstance(error, commands.MissingRequiredArgument):
         if ctx.command.parent is None:
             return await ctx.invoke(client.get_command('help'), ctx.command.name)

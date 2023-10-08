@@ -7,7 +7,7 @@ class avatar(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(description='Returns User Avatar', usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Returns User Avatar', aliases=['av'], usage=f"{os.path.basename(__file__)[:-3]}")
     @commands.check(is_command_enabled)
     @commands.bot_has_permissions(embed_links=True)
     async def avatar(self, ctx, member: discord.Member=None):
