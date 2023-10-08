@@ -50,7 +50,7 @@ async def on_command(ctx):
     if guild_db['updated'] == False:
         client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"updated":True}})
         view = confirmation.Buttons(ctx)
-        msg = await ctx.send(f"{emotes['bot']} | The bot was updated. Click to read the Update Log!",view=view,ephemeral=True)
+        msg = await ctx.send(f"{emotes['bot']} | A New Mail has arrived. Click To Read!",view=view,ephemeral=True)
         await view.wait()
         
         try:
@@ -65,7 +65,7 @@ async def on_command(ctx):
                 if msg: await msg.delete()
         except:
             disable = confirmation.Disabled(ctx)
-            return await msg.edit(content=f"{emotes['bot']} | The bot was updated. Run any command read the Update Log!", view=disable)
+            return await msg.edit(content=f"{emotes['bot']} | A New Mail has arrived. Run any command read the Mail!", view=disable)
                 
 @client.event
 async def on_command_error(ctx, error):
