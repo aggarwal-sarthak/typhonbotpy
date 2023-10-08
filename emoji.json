@@ -17,7 +17,6 @@
     "TeamPseudoUser": "<:user:1000026674634707004>",
     "VerifiedBot": "<:bot:1000024460541313084>",
     "VerifiedDeveloper": "<:dev:1000020811622658110>",
-    "active_developer":"<:activedev:1115267014169219173>",
     "verified": "<:server_verified:852438231311843338>",
     "status": "<:statustag:852438189837647882>",
     "text" : "<:channel:1000193913207935028>",
@@ -26,5 +25,5 @@
     "owner" : "<:dec_owner:1000219414362345473>",
     "loading" : "<a:loading:1153773843656224839>",
     "bot" : "<:bot:1000024460541313084>",
-    "active_dev" : "<:active_dev:1159844021838028891>"
+    "active_developer" : "<:active_dev:1159844021838028891>"
 }
