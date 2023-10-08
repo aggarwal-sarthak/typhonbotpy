@@ -18,7 +18,7 @@ class announce(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(description='Custom Embed Builder',aliases = ['embed'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.command(description='Custom Embed Builder',aliases = ['embed', 'ann'], usage=f"{os.path.basename(__file__)[:-3]}")
     @commands.check(is_command_enabled)
     @commands.has_guild_permissions(administrator=True)
     @commands.bot_has_guild_permissions(administrator=True)
