@@ -35,6 +35,9 @@ client.db = db_client.typhonbot
 @client.event
 async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
+    logs_channel = client.get_channel(client.config["bot_logs"])
+    if logs_channel:
+        await logs_channel.send(f'```✅ | Bot Started!```')
 
 @client.event
 async def on_command(ctx):
@@ -100,7 +103,7 @@ async def on_command_error(ctx, error):
         return await ctx.reply(f"{client.emotes['failed']} | I Don't Have `{err}` Permission To Use This Command!")
     
     target_channel = client.get_channel(client.config["error_logs"])
-    if target_channel: await target_channel.send(f'```{error}```')
+    if target_channel: await target_channel.send(f'```{ctx.command.name} : {error}```')
 
 @client.event
 async def on_guild_join(guild):
