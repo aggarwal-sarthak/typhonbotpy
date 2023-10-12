@@ -34,10 +34,10 @@ client.db = db_client.typhonbot
 
 @client.event
 async def on_ready():
-    print(f'✅ | {client.user.name} Is Ready!')
     logs_channel = client.get_channel(client.config["bot_logs"])
     if logs_channel:
         await logs_channel.send(f'```✅ | Bot Started!```')
+    print(f'✅ | {client.user.name} Is Ready!')
 
 @client.event
 async def on_command(ctx):
