@@ -8,7 +8,6 @@ import sys
 from datetime import datetime
 from validation import db_client
 import confirmation
-from memory_profiler import profile
 with open('config.json', 'r') as f:
     config = json.load(f)
 with open('emoji.json', 'r') as f:
@@ -18,7 +17,7 @@ intents = discord.Intents.all()
 intents.presences = False
 intents.voice_states = True
 
-@profile
+
 def get_prefix(client, ctx):
     if ctx.content.startswith(client.user.mention + ' '): return f'{client.user.mention} '
     elif ctx.content.startswith(client.user.mention): return f'{client.user.mention}'
@@ -33,7 +32,7 @@ client.config = config
 client.emotes = emotes
 client.db = db_client.typhonbot
 
-@profile
+
 @client.event
 async def on_ready():
     logs_channel = client.get_channel(client.config["bot_logs"])
@@ -42,7 +41,7 @@ async def on_ready():
     print(f'✅ | {client.user.name} Is Ready!')
 
 
-@profile
+
 @client.event
 async def on_command(ctx):
     if not ctx.author.guild_permissions.administrator: return
