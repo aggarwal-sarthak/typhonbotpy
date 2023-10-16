@@ -1,27 +1,249 @@
 from __future__ import annotations
+from typing import Optional,Callable, Dict, List, Any
+from discord import ButtonStyle,ChannelType, CategoryChannel, Embed, ForumChannel, HTTPException, Interaction, StageChannel, Colour, SelectOption, TextStyle,Embed, Member, Role
+from discord.ext.commands import Bot
 from discord.ext import commands
-import os
+from discord.ui import Item, Select, select, Button, button, View, ChannelSelect, Modal, TextInput
 from contextlib import suppress
 import json
-from discord.ui import Item, Select, select, Button, button, View, ChannelSelect, Modal, TextInput
-from typing import Optional,Callable, Dict, List, Any
-from discord import ButtonStyle,ChannelType, CategoryChannel, Embed, ForumChannel, HTTPException, Interaction, StageChannel, Colour, SelectOption, TextStyle
-from discord.ext.commands import Bot
-from validation import db_client
+import os
+from validation import is_command_enabled
+import timeago, datetime
+import pytz
+import requests
+
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
-class updatelog(commands.Cog):
+class utilcmd(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.deleted_messages = {}
 
-    @commands.command(description="Sends the UpdateLog!",aliases=['update'],usage=f"{os.path.basename(__file__)[:-3]}")
-    async def updatelog(self,ctx):
+    @commands.command(description='Custom Embed Builder',aliases = ['embed', 'ann'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.has_guild_permissions(administrator=True)
+    @commands.bot_has_guild_permissions(administrator=True)
+    @commands.cooldown(1, 60, commands.BucketType.guild)
+    async def announce(self,ctx):
         global author
         author = ctx.author
-        if ctx.author.id not in self.client.config["owner"]: return
-        view = EmbedCreator(bot=self.client)
-        await ctx.send(embed=view.get_default_embed, view=view)
+        try:
+            view = EmbedCreator(bot=self.client)
+            await ctx.send(embed=view.get_default_embed, view=view)
+        except Exception as e:
+            pass
+    @commands.command(description='Returns User Avatar', aliases=['av'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
+    async def avatar(self, ctx, member: Member=None):
+        if not member: member = ctx.author
+        embed = Embed(title=f"{member}'s Avatar",color=self.client.config['color'])
+        embed.set_image(url=member.display_avatar)
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+        await ctx.reply(embed=embed)
+
+    @commands.group(name='banner', description='Returns Banner', usage=f"{os.path.basename(__file__)[:-3]} <user>", invoke_without_command=True)
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
+    async def banner(self, ctx, member: Member=None):
+        if not member: member = ctx.author
+        try:
+            embed = Embed(title=f"{member}'s Banner",color=self.client.config['color'])
+            user = await self.client.fetch_user(member.id)
+            banner_url = user.banner.url
+            embed.set_image(url=banner_url)
+            embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+            await ctx.reply(embed=embed)
+        except:
+            await ctx.reply(f"{self.client.emotes['failed']} | `{member}` Does Not Have A Banner!")
+
+    @banner.command(name='server', description='Returns Server Banner', usage=f"{os.path.basename(__file__)[:-3]} server")
+    @commands.bot_has_permissions(embed_links=True)
+    async def server(self, ctx):
+        if ctx.guild.banner :
+            embed = Embed(title=f"{ctx.guild}'s Banner",color=self.client.config['color'])
+            embed.set_image(url=ctx.guild.banner)
+            embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+            await ctx.reply(embed=embed)
+        else:
+            await ctx.reply(f"{self.client.emotes['failed']} | This Server Does Not Have A Banner!")
+
+    @commands.command(description='Returns First Message In The Channel By The User', usage=f"{os.path.basename(__file__)[:-3]} firstmsg [user]")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True, read_message_history=True)
+    async def firstmsg(self, ctx, member: Member=None):
+        if not member:
+            member = ctx.author
+
+        async for message in ctx.channel.history(limit=None, oldest_first=True):
+            if message.author == member:
+                return await message.reply(f"{self.client.emotes['success']} | Found First Message By `{member.name}`!")
+                
+        await ctx.reply(f"{self.client.emotes['failed']} | No Message Found By `{member.name}`!")
+
+    @commands.command(description='Returns Membercount', usage=f"{os.path.basename(__file__)[:-3]}", aliases= ['members', 'mc'])
+    @commands.check(is_command_enabled)
+    async def membercount(self, ctx):
+        embed = Embed(title=None,color=self.client.config['color'])
+        embed.add_field(name='**Members**', value=ctx.guild.member_count)
+        embed.timestamp = ctx.message.created_at
+        await ctx.reply(embed=embed)
+
+    @commands.command(description='Returns Information About Mentioned Role', usage=f"{os.path.basename(__file__)[:-3]} <role>")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def roleinfo(self, ctx, role: Role=None):
+        permissions = ", ".join(sorted([str(perms[0]).replace("_"," ").title() for perms in role.permissions if perms[1] is True]))
+        if not permissions: permissions = "None"
+        
+        embed = Embed(title=None,color=self.client.config['color'])
+        embed.add_field(name="**__General Information__**", value=f"**Name :** {role.name}\n**ID :** {role.id}\n**Role Position :** {len(ctx.guild.roles) - role.position}\n**Color :** {role.color}\n**Created At :** {timeago.format(role.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),datetime.datetime.now())}\n**Mentionable :** {str(role.mentionable).title()}\n**Hoisted :** {str(role.hoist).title()}\n**Managed :** {str(role.managed).title()}", inline=False)
+        embed.add_field(name="**__Permissions__**", value=f"{permissions if len(permissions)<=256 else 'Too Many Permissions To Show!'}", inline=False)
+        embed.add_field(name=f"**__Members [{len(role.members)}]__**", value=f"{', '.join([member.mention for member in role.members]) if len(', '.join([member.mention for member in role.members]))<256 else 'Too Many Members To Show!'}", inline=False)
+        if role.icon: embed.set_thumbnail(url=role.icon)
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+        await ctx.reply(embed=embed)
+
+    @commands.command(description='Returns Information About Server', aliases=['server', 'si'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def serverinfo(self, ctx):
+        roles = []
+        for role in ctx.guild.roles:
+            roles.append(str(role.mention))
+        roles.reverse()
+
+        banned = [entry async for entry in ctx.guild.bans()]
+        features = ""
+        for feature in ctx.guild.features:
+            features += self.client.emotes['success'] + ":" + str(feature.replace("_"," ")).title() + "\n"
+
+        embed = Embed(title=f"{ctx.guild.name}'s Information",color=self.client.config['color'])
+        embed.add_field(name="**__About__**", value=f"**Name:** {ctx.guild.name}\n**ID:** {ctx.guild.id}\n**Owner {self.client.emotes['owner']}:** {ctx.guild.owner} [{ctx.guild.owner.mention}]\n**Created At:** {timeago.format(ctx.guild.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),datetime.datetime.now())}\n**Members :** {ctx.guild.member_count}\n**Banned :** {len(banned)}", inline=False)
+        flag = [flags for flags in ctx.guild.system_channel_flags]
+        embed.add_field(name="**__Extras__**", value=f"**Verification Level:** {str(ctx.guild.verification_level).title()}\n**Upload Limit:** {ctx.guild.filesize_limit/1048576}MB\n**Inactive Channel:** {ctx.guild.afk_channel.mention if ctx.guild.afk_channel else self.client.emotes['failed']}\n**Inactive Timeout:** {str(int(ctx.guild.afk_timeout/60))+' Minutes' if ctx.guild.afk_timeout else 'None'}\n**System Messages Channel:** {ctx.guild.system_channel.mention if ctx.guild.system_channel else self.client.emotes['failed']}\n**System Welcome Messages:** {self.client.emotes['success'] if flag[0][1]==True else self.client.emotes['failed']}\n**System Boost Messages:** {self.client.emotes['success'] if flag[1][1]==True else self.client.emotes['failed']}\n**Default Notifications:** {str(ctx.guild.default_notifications).replace('NotificationLevel.','').replace('_',' ').title()}\n**Explicit Media Content Filter:** {str(ctx.guild.explicit_content_filter).replace('_',' ').title()}\n**2FA Requirement:** {self.client.emotes['success'] if str(ctx.guild.mfa_level).replace('MFALevel.','')=='require_2fa' else self.client.emotes['failed']}\n**Boost Bar Enabled:** {self.client.emotes['success'] if ctx.guild.premium_progress_bar_enabled==True else self.client.emotes['failed']}", inline=False)
+        embed.add_field(name="**__Description__**", value=f"{ctx.guild.description}", inline=False)
+        embed.add_field(name="**__Features__**", value=f"{features}")
+        embed.add_field(name="**__Channels__**", value=f"**Total:** {len(ctx.guild.channels)}\n**Channels:** {self.client.emotes['text']} {len(ctx.guild.text_channels)} | {self.client.emotes['voice']} {len(ctx.guild.voice_channels)}\n**Rules Channel:** {ctx.guild.rules_channel.mention if ctx.guild.rules_channel else self.client.emotes['failed'] }", inline=False)
+        embed.add_field(name="**__Emojis__**", value=f"**Regular:** {[emoji.animated for emoji in ctx.guild.emojis].count(False)}\n**Animated:** {[emoji.animated for emoji in ctx.guild.emojis].count(True)}", inline=False)
+        embed.add_field(name="**__Boosts__**", value=f"**Level:** {ctx.guild.premium_tier} [{self.client.emotes['premium']} {ctx.guild.premium_subscription_count} Boosts]\n**Server Booster:** {ctx.guild.premium_subscriber_role.mention if ctx.guild.premium_subscriber_role else self.client.emotes['failed']}", inline=False)
+        embed.add_field(name=f"**__Roles [{len(ctx.guild.roles)-1}]__**", value=", ".join(roles[:-1]) if len(roles)<40 else "Too Many Roles To Show!", inline=False)
+        if ctx.guild.icon: embed.set_thumbnail(url=ctx.guild.icon)
+        if ctx.guild.banner : embed.set_image(url=ctx.guild.banner)
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+        await ctx.reply(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        self.deleted_messages[message.channel.id] = message
+
+    @commands.command(description='Returns Last Deleted Messaged In The Channel', usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def snipe(self, ctx):
+        if ctx.channel.id not in self.deleted_messages:
+            return await ctx.reply(f"{self.client.emotes['failed']} | No Deleted Messages Found In This Channel!")
+
+        embed = Embed(title='Message Found',color=self.client.config['color'])
+        embed.add_field(name="**__Information__**", value=f"**Message By :** {self.deleted_messages[ctx.channel.id].author.mention}\n**Channel :** {ctx.channel.mention}\n**Time :** {timeago.format(self.deleted_messages[ctx.channel.id].created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),datetime.datetime.now())}", inline=False)
+        embed.add_field(name="**__Content__**", value=f"{self.deleted_messages[ctx.channel.id].content}", inline=False)
+        if self.deleted_messages[ctx.channel.id].attachments[0].url: embed.set_image(url=self.deleted_messages[ctx.channel.id].attachments[0].url)
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+        await ctx.reply(embed=embed)
+
+
+    @commands.command(usage=f"{os.path.basename(__file__)[:-3]} <Text>", description = "Returns Superscript Of A Given Text", aliases = ['sup'])
+    @commands.check(is_command_enabled)
+    @commands.cooldown(1, 10, commands.BucketType.member)
+    async def superscript(self, ctx:commands.Context, *, text:str):
+        await ctx.reply(get_super(text))
+
+    @commands.command(description='Returns Urban Dictionary Meaning Of The Query', usage=f"{os.path.basename(__file__)[:-3]} <Query>")
+    @commands.check(is_command_enabled)
+    async def urban(self, ctx, *, query):
+        url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
+        querystring = {"term": query}
+        headers = {
+	        "X-RapidAPI-Key": self.client.config['rapidapi'],
+	        "X-RapidAPI-Host": "mashape-community-urban-dictionary.p.rapidapi.com"
+        }
+
+        response = requests.get(url, headers=headers, params=querystring).json()
+        if not len(response['list']):
+            msg = 'No Meaning Found!'
+        else:
+            msg = response['list'][0]['definition']
+
+        embed = Embed(title=query, description=msg, color=self.client.config['color'])
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+        await ctx.reply(embed=embed)
+
+    @commands.command(description="Returns Information For The Mentioned User", aliases=['user', 'ui', 'about'], usage=f"{os.path.basename(__file__)[:-3]} [User]")
+    @commands.check(is_command_enabled)
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def userinfo(self, ctx, member:Member=None):
+        if not member:
+            member = ctx.author
+
+        roles = []
+        for role in member.roles:
+            roles.append(str(role.mention))
+        roles.reverse()
+
+        permissions = [str(permission) for permission, value in member.guild_permissions if value]
+        permission_list = []
+        for permission in permissions:
+            words = permission.split("_")
+            capitalized_words = [word.capitalize() for word in words]
+            formatted_permission = " ".join(capitalized_words)
+            permission_list.append(formatted_permission)
+        permission_list.sort()
+
+        if ctx.guild.owner_id == member.id: ack = "Server Owner"
+        elif "Administrator" in permission_list: ack = "Server Administrator"
+        elif "Manage Guild" in permission_list: ack = "Server Moderator"
+        else: ack = "Server Member"
+
+        embed = Embed(title=None,color=self.client.config['color'])
+        badges = member.public_flags.all()
+        badge_text=""
+        for badge in badges:
+            badge_text += self.client.emotes[f'{badge.name}']+" "
+        now = datetime.datetime.now()
+        embed.add_field(name="**__General Information__**", value=f"**Name :** {member}\n**ID :** {member.id}\n**Nickname :** {member.nick}\n**Badges :** {badge_text}\n**Account Creation :** {timeago.format(member.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}\n**Server Joined :** {timeago.format(member.joined_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}", inline=False)
+        if len(str(", ".join([x.mention for x in member.roles])))>1024:
+            embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**", value="Too Many To Display!", inline=False)
+        else:
+            embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**", value=", ".join(roles[:-1]), inline=False)
+        if len(", ".join([x for x in permission_list]))>1024:
+            embed.add_field(name=f"**__Permissions__**", value="Too Many To Display!", inline=False)
+        else:
+            embed.add_field(name=f"**__Permissions__**", value=", ".join(permission_list), inline=False)
+        embed.add_field(name="**__Acknowledgements__**", value=ack)
+        embed.set_thumbnail(url=member.avatar)
+        try:
+            user = await self.client.fetch_user(member.id)
+            banner_url = user.banner.url
+            embed.set_image(url=banner_url)
+        except:
+            pass
+        embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
+        await ctx.reply(embed=embed)
+
+
+def get_super(x):
+    normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
+    super_s = "ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖ۹ʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾"
+    res = x.maketrans(''.join(normal), ''.join(super_s))
+    return x.translate(res)
+
 
 class ChannelSelectPrompt(View):
     """
@@ -514,7 +736,7 @@ class EmbedCreator(View):
             embed (discord.Embed)
         """
         embed = Embed(title=None,
-                      description="Select Options from the Drop down menu!", colour=0xfb7c04)
+                      description="Select Options from the Drop down menu!", colour=config['color'])
         return embed
 
     @select(placeholder="Edit a section")
@@ -548,15 +770,15 @@ class EmbedCreator(View):
         if interaction.user != author:
             await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
-        dict = self.embed.to_dict()
-        updateLog = db_client.typhonbot.updatelog
-        if(updateLog is not None):
-            updateLog.delete_many({})
-        updateLog.insert_one(dict)
-        await interaction.message.delete()
-        await interaction.message.channel.send(f"{emotes['success']} | Update Log letter Sent!")
-        db_client.typhonbot.guilds.update_many({},{"$set":{"updated":False}})
-        
+        prompt = ChannelSelectPrompt(
+            "Select a channel to send this embed...", True, 1)
+        await interaction.response.send_message(view=prompt, ephemeral=True)
+        await prompt.wait()
+        if prompt.values:
+            if not isinstance(prompt.values[0], (StageChannel, ForumChannel, CategoryChannel)):
+                await prompt.values[0].send(embed=self.embed)  # type: ignore
+                await interaction.message.delete()  # type: ignore
+
     @button()
     async def cancel_callback(self, interaction: Interaction, button: Button) -> None:
         """
@@ -573,6 +795,5 @@ class EmbedCreator(View):
         await interaction.message.delete()  # type: ignore
         self.stop()
 
-        
 async def setup(client):
-    await client.add_cog(updatelog(client)) 
+    await client.add_cog(utilcmd(client)) 
