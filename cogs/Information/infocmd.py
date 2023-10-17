@@ -23,7 +23,11 @@ class infocmd(commands.Cog):
             embed.add_field(name="",value=f"[Invite Me](https://discord.com/api/oauth2/authorize?client_id=756052319417925633&permissions=8&redirect_uri=https%3A%2F%2Fdiscord.com%2Finvite%2F5UqVvZj&response_type=code&scope=bot%20guilds.join%20applications.commands) **|** [Support Server](https://discord.com/invite/5UqVvZj) **|** [Vote Me](https://top.gg/bot/756052319417925633/vote)",inline=False)
             for folder in os.listdir('./cogs'):
                 if(ctx.author.id not in self.client.config['owner'] and folder == "Developer"): continue
-                embed.add_field(name=f"{folder}",value=f"`{'`, `'.join([filename[:-3] for filename in os.listdir(f'./cogs/{folder}') if filename.endswith('.py')])}`",inline=False)
+                filename = [file[:-3] for file in os.listdir(f'./cogs/{folder}') if file.endswith('.py')]
+                cog  = self.client.get_cog(filename[0])
+                commands = cog.get_commands()
+                embed.add_field(name=f"{folder}",value=f"`{'`, `'.join(command.name for command in commands)}`",inline=False)
+
             embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
             return await ctx.reply(embed=embed)
             
