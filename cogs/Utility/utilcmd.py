@@ -153,7 +153,7 @@ class utilcmd(commands.Cog):
         embed = Embed(title='Message Found',color=self.client.config['color'])
         embed.add_field(name="**__Information__**", value=f"**Message By :** {self.deleted_messages[ctx.channel.id].author.mention}\n**Channel :** {ctx.channel.mention}\n**Time :** {timeago.format(self.deleted_messages[ctx.channel.id].created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),datetime.datetime.now())}", inline=False)
         embed.add_field(name="**__Content__**", value=f"{self.deleted_messages[ctx.channel.id].content}", inline=False)
-        if self.deleted_messages[ctx.channel.id].attachments[0].url: embed.set_image(url=self.deleted_messages[ctx.channel.id].attachments[0].url)
+        if len(self.deleted_messages[ctx.channel.id].attachments): embed.set_image(url=self.deleted_messages[ctx.channel.id].attachments[0].url)
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)
 
