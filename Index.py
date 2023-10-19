@@ -17,7 +17,6 @@ intents = discord.Intents.all()
 intents.presences = False
 intents.voice_states = True
 
-
 def get_prefix(client, ctx):
     if ctx.content.startswith(client.user.mention + ' '): return f'{client.user.mention} '
     elif ctx.content.startswith(client.user.mention): return f'{client.user.mention}'
@@ -31,7 +30,6 @@ client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=N
 client.config = config
 client.emotes = emotes
 client.db = db_client.typhonbot
-
 
 @client.event
 async def on_ready():

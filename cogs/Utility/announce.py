@@ -1,104 +1,36 @@
 from __future__ import annotations
-import discord
-from discord.ext import commands
-import os
-import pagination
-from contextlib import suppress
-import json
-from discord.ui import Item, Select, select, Button, button, View, ChannelSelect, Modal, TextInput
 from typing import Optional,Callable, Dict, List, Any
 from discord import ButtonStyle,ChannelType, CategoryChannel, Embed, ForumChannel, HTTPException, Interaction, StageChannel, Colour, SelectOption, TextStyle
 from discord.ext.commands import Bot
-from validation import db_client
+from discord.ext import commands
+from discord.ui import Item, Select, select, Button, button, View, ChannelSelect, Modal, TextInput
+from contextlib import suppress
+import json
+import os
+from validation import is_command_enabled
 
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
-
-class devcmd(commands.Cog):
+class announce(commands.Cog):
     def __init__(self, client):
         self.client = client
-    @commands.command(description='Evaluates given code',aliases=['eval', 'e'], usage=f"{os.path.basename(__file__)[:-3]} <code>")
-    async def evaluate(self, ctx, *,code: str):
-        if ctx.author.id not in self.client.config["owner"]: return
-        try:
-            result = eval(code)
-            await ctx.send(f"{self.client.emotes['success']} | **Result:** {result}")
 
-        except Exception as e:
-            await ctx.send(f"{self.client.emotes['failed']} | Error: {e}")
-
-    @commands.command(description='Generates Invite Link of a Guild',aliases=['invites'], usage=f"{os.path.basename(__file__)[:-3]} <guild_id>")    
-    async def invite(self,ctx,guild: discord.Guild):
-        if ctx.author.id not in self.client.config["owner"]: return
-        try:
-            invite = await guild.invites()
-        except discord.Forbidden:
-            await ctx.reply(f"{self.client.emotes['failed']} | Missing Permission to generate Invite!")
-            return
-        except discord.HTTPException:
-            await ctx.reply(f"{self.client.emotes['failed']} | An error occurred while fetching the information!")
-            return
-        await ctx.send(f"{invite[0]}")
-
-    @commands.command(description='Leaves The Server With Given ID', usage=f"{os.path.basename(__file__)[:-3]} <serverid>")
-    async def leave(self, ctx):
-        if ctx.author.id not in self.client.config["owner"]: return
-        guild = discord.utils.get(self.client.guilds, id=int(ctx))
-
-        if guild:
-            await guild.leave()
-            await ctx.reply(f"{self.client.emotes['success']} | Left The server: `{guild.name}`!")
-        else:
-            await ctx.reply(f"{self.client.emotes['faield']} | No Server Found With Given ID!")
-       
-    @commands.command(description='Loads A Given Command', usage=f"{os.path.basename(__file__)[:-3]} <cmd>")
-    async def load(self, ctx, cog: str):
-        if ctx.author.id not in self.client.config["owner"]: return
-        await self.client.load_extension(f'cogs.{cog}')
-        await ctx.reply(f"{self.client.emotes['success']} | Command {cog} Loaded Successfully!")
-
-    @commands.command(description='Reloads A Given Command', usage=f"{os.path.basename(__file__)[:-3]} <cmd>")
-    async def reload(self, ctx, cog: str):
-        if ctx.author.id not in self.client.config["owner"]: return
-        await self.client.reload_extension(f'cogs.{cog}')
-        await ctx.reply(f"{self.client.emotes['success']} | Command {cog} Reloaded Successfully!")
-
-    @commands.command(description='Returns Bot Servers', usage=f"{os.path.basename(__file__)[:-3]}", aliases=['s'])
-    async def servers(self, ctx):
-        if ctx.author.id not in self.client.config["owner"]: return
-        data = sorted(self.client.guilds, key=lambda x: x.member_count, reverse=True)
-
-        embeds = []
-        for i in range(0,len(data), 20):
-            description = ""
-            for j in range(i, min(i+20, len(data))):
-                description += f'**{str(j+1)}.** {str(data[j].name)} **|** {str(data[j].id)} **|** {str(data[j].member_count)}\n'
-            pagination_embed = discord.Embed(title=f'Bot Servers [{len(self.client.guilds)}]', description=description,color=self.client.config['color'])
-            pagination_embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
-            embeds.append(pagination_embed)
-        await pagination_check(self, ctx, data, embeds)
-    @commands.command(description='Unloads A Given Command', usage=f"{os.path.basename(__file__)[:-3]} <cmd>")
-    async def unload(self, ctx, cog: str):
-        if ctx.author.id not in self.client.config["owner"]: return
-        await self.client.unload_extension(f'cogs.{cog}')
-        await ctx.reply(f"{self.client.emotes['success']} | Command {cog} Unloaded Successfully!")    
-
-    @commands.command(description="Sends the UpdateLog!",aliases=['update'],usage=f"{os.path.basename(__file__)[:-3]}")
-    async def updatelog(self,ctx):
+    @commands.command(description='Custom Embed Builder',aliases = ['embed', 'ann'], usage=f"{os.path.basename(__file__)[:-3]}")
+    @commands.check(is_command_enabled)
+    @commands.has_guild_permissions(administrator=True)
+    @commands.bot_has_guild_permissions(administrator=True)
+    @commands.cooldown(1, 60, commands.BucketType.guild)
+    async def announce(self,ctx):
         global author
         author = ctx.author
-        if ctx.author.id not in self.client.config["owner"]: return
-        view = EmbedCreator(bot=self.client)
-        await ctx.send(embed=view.get_default_embed, view=view)
-
-
-async def pagination_check(self, ctx, data, embeds):
-    if len(data)>20:
-        await pagination.Simple(timeout=60).start(ctx, pages=embeds)
-    elif (len(data)<20 and len(data)>0):
-        await ctx.reply(embed=embeds[0])
-
+        try:
+            view = EmbedCreator(bot=self.client)
+            await ctx.send(embed=view.get_default_embed, view=view)
+        except Exception as e:
+            pass
 
 class ChannelSelectPrompt(View):
     """
@@ -591,7 +523,7 @@ class EmbedCreator(View):
             embed (discord.Embed)
         """
         embed = Embed(title=None,
-                      description="Select Options from the Drop down menu!", colour=0xfb7c04)
+                      description="Select Options from the Drop down menu!", colour=config['color'])
         return embed
 
     @select(placeholder="Edit a section")
@@ -625,15 +557,15 @@ class EmbedCreator(View):
         if interaction.user != author:
             await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
-        dict = self.embed.to_dict()
-        updateLog = db_client.typhonbot.updatelog
-        if(updateLog is not None):
-            updateLog.delete_many({})
-        updateLog.insert_one(dict)
-        await interaction.message.delete()
-        await interaction.message.channel.send(f"{emotes['success']} | Update Log letter Sent!")
-        db_client.typhonbot.guilds.update_many({},{"$set":{"updated":False}})
-        
+        prompt = ChannelSelectPrompt(
+            "Select a channel to send this embed...", True, 1)
+        await interaction.response.send_message(view=prompt, ephemeral=True)
+        await prompt.wait()
+        if prompt.values:
+            if not isinstance(prompt.values[0], (StageChannel, ForumChannel, CategoryChannel)):
+                await prompt.values[0].send(embed=self.embed)  # type: ignore
+                await interaction.message.delete()  # type: ignore
+
     @button()
     async def cancel_callback(self, interaction: Interaction, button: Button) -> None:
         """
@@ -651,4 +583,4 @@ class EmbedCreator(View):
         self.stop()
 
 async def setup(client):
-    await client.add_cog(devcmd(client))
+    await client.add_cog(announce(client)) 
