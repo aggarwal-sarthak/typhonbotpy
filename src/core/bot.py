@@ -1,32 +1,42 @@
 import discord
 from discord.ext import commands
-import os
-import asyncio
-import json
 import logging
 import sys
-from datetime import datetime
-from src.core.validation import db_client
-import src.core.confirmation
-with open('config.json', 'r') as f:
-    config = json.load(f)
-with open('emoji.json', 'r') as f:
-    emotes = json.load(f)
 import logging
+from src.core.secrets import Env
+
 intents = discord.Intents.all()
 intents.presences = False
 intents.voice_states = True
 
-
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-
-class Tether():
-    def __init__(self):
+class Tether(Env):
+    def __init__(self) -> None:
+        super().__init__()
         self.client = commands.AutoShardedBot(command_prefix=";", intents=intents, help_command=None, case_insensitive=True)
-        self.client.config = config
-        self.client.emotes = emotes
-        self.client.db = db_client.typhonbot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        logs_channel = self.client.get_channel(tether.bot_logs)
+        if logs_channel:
+            await logs_channel.send(f'```✅ | Bot Started!```')
+        print(f'✅ | {self.client.user.name} Is Ready!')
+
+    async def run(self, token):
+        async with self.client:
+            await self.client.start(token)
+
+
+
+
+# from datetime import datetime
+# from src.core.validation import db_client
+# import src.core.confirmation
+# with open('config.json', 'r') as f:
+#     config = json.load(f)
+# with open('emoji.json', 'r') as f:
+#     emotes = json.load(f)
 
     # def get_prefix(self, ctx):
     #     if ctx.content.startswith(self.client.user.mention + ' '): return f'{self.client.user.mention} '
@@ -37,18 +47,12 @@ class Tether():
     #     else:
     #         return config['prefix']
         
-    async def load(self,client):
-        for folder in os.listdir("./src/cogs"):
-            for filename in os.listdir(f'./src/cogs/{folder}'):
-                if filename.endswith(".py"):
-                    await client.load_extension(f"src.cogs.{folder}.{filename[:-3]}")
-                    print(f"✅ | {filename[:-3]} Is Loaded!")
-
-    async def run(self,token):
-        async with self.client:
-            await self.load(self.client)
-            await self.client.start(token)
-
+    # async def load(self,client):
+    #     for folder in os.listdir("./src/cogs"):
+    #         for filename in os.listdir(f'./src/cogs/{folder}'):
+    #             if filename.endswith(".py"):
+    #                 await client.load_extension(f"src.cogs.{folder}.{filename[:-3]}")
+    #                 print(f"✅ | {filename[:-3]} Is Loaded!")
 
 # client = commands.Bot(command_prefix=get_prefix, intents=intents, help_command=None, case_insensitive=True,)
 # client.config = config
@@ -61,8 +65,6 @@ class Tether():
 #     if logs_channel:
 #         await logs_channel.send(f'```✅ | Bot Started!```')
 #     print(f'✅ | {client.user.name} Is Ready!')
-
-
 
 # @client.event
 # async def on_command(ctx):
@@ -188,3 +190,5 @@ class Tether():
 #         await client.start(config['token'])
 
 # asyncio.run(main()) 
+
+tether = Tether()
