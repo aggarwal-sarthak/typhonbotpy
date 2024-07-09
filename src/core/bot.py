@@ -21,7 +21,7 @@ class Tether(Env):
         intents.guilds = True
         intents.messages = True
         intents.message_content = True
-        self.client = commands.AutoShardedBot(command_prefix=';', intents=intents, help_command=None, case_insensitive=True)
+        self.client = commands.AutoShardedBot(command_prefix=self.get_prefix, intents=intents, help_command=None, case_insensitive=True)
         self.constants = Constants()
         self.db = MongoClient(self.mongo_uri).typhonbot
 
