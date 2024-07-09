@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import os
-from src.core import confirmation
+from src.core.buttons import Prompt
 from src.core.validation import is_command_enabled
 
 class kick(commands.Cog):
@@ -18,7 +18,7 @@ class kick(commands.Cog):
         else:
             reason=None
 
-        view = confirmation.Buttons(ctx)
+        view = Prompt(ctx)
         role = user.top_role
 
         if(user==ctx.guild.owner):
@@ -43,7 +43,7 @@ class kick(commands.Cog):
                 if msg: await msg.delete()
                 return await ctx.reply(f"{self.client.emotes['success']} | Kick Cancelled Successfully!")
         except:
-            disable = confirmation.Disabled(ctx)
+            disable = buttons.Disabled(ctx)
             return await msg.edit(content=f"You Are About To Kick: `{user}`",view=disable)
 
 async def setup(client):

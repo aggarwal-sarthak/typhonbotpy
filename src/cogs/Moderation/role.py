@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 import os
-from src.core import confirmation
+from src.core.buttons import Prompt
 import re
 from types import SimpleNamespace
 from src.core.validation import is_command_enabled
@@ -117,7 +117,7 @@ async def confirm(self, ctx, members, mode):
     if mode == 'add': title = 'Do You Want To Add Roles?'
     elif mode == 'remove': title = 'Do You Want To Remove Roles?'
 
-    view = confirmation.Buttons(ctx)
+    view = Prompt(ctx)
     embed = discord.Embed(title=title,description=desc,color=self.client.config['color'])
 
     msg = await ctx.reply(embed=embed,view=view)
@@ -133,7 +133,7 @@ async def confirm(self, ctx, members, mode):
             if msg: await msg.delete()
             await ctx.reply(f'{self.client.emotes["failed"]} | Command Cancelled!')
     except:
-        disable = confirmation.Disabled(ctx)
+        disable = Prompt(ctx)
         return await msg.edit(embed=embed, view=disable)
     
     self.mem_dict = {}

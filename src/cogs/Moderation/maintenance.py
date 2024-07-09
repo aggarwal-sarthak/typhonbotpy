@@ -1,7 +1,7 @@
 from discord.ext import commands
 import os
 import discord
-from src.core import confirmation
+from src.core.buttons import Prompt
 from src.core.validation import is_command_enabled
     
 class maintenance(commands.Cog):
@@ -25,7 +25,7 @@ class maintenance(commands.Cog):
         else:
             role = discord.utils.get(ctx.guild.roles, id=role[0].id)
 
-        view = confirmation.Buttons(ctx)
+        view = Prompt(ctx)
         msg = await ctx.reply(f'Enable Maintenance Mode: `{role}`?', view=view)
         await view.wait()
         
@@ -45,7 +45,7 @@ class maintenance(commands.Cog):
                 if msg: await msg.delete()
                 return await ctx.reply(f"{self.client.emotes['success']} | Maintenance Cancelled Successfully!")
         except:
-            disable = confirmation.Disabled(ctx)
+            disable = buttons.Disabled(ctx)
             return await msg.edit(content=f'Enable Maintenance Mode: `{role}`?',view=disable)
 
     @maintenance.command(name='off', description='Disables Maintenance Mode For Server', usage=f"{os.path.basename(__file__)[:-3]} off [role]", aliases=['disable'])
@@ -58,7 +58,7 @@ class maintenance(commands.Cog):
         else:
             role = discord.utils.get(ctx.guild.roles, id=role[0].id)
 
-        view = confirmation.Buttons(ctx)
+        view = buttons.Buttons(ctx)
         msg = await ctx.reply(f'Disable Maintenance Mode: `{role}`?', view=view)
         await view.wait()
         

@@ -1,6 +1,6 @@
 from discord.ext import commands
 import os
-from src.core import confirmation
+from src.core.buttons import Prompt
 from src.core.validation import is_command_enabled
 
 class unban(commands.Cog):
@@ -21,7 +21,7 @@ class unban(commands.Cog):
         else:
             reason = None
 
-        view = confirmation.Buttons(ctx)
+        view = Prompt(ctx)
         user = await self.client.fetch_user(user)
 
         msg = await ctx.reply(f"You Are About To Unban: `{user}`",view=view)
@@ -37,7 +37,7 @@ class unban(commands.Cog):
                 if msg: await msg.delete()
                 return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
         except:
-            disable = confirmation.Disabled(ctx)
+            disable = Prompt(ctx)
             return await msg.edit(content=f"You Are About To Unban: `{user}`",view=disable)
         
     @unban.command(name='all', description="Unbans Member from the Server",usage=f"{os.path.basename(__file__)[:-3]} all [reason]")
@@ -52,7 +52,7 @@ class unban(commands.Cog):
         else:
             reason = None
 
-        view = confirmation.Buttons(ctx)
+        view = Prompt(ctx)
         msg = await ctx.reply(f"You Are About To Unban: `{len(banned)}` Members",view=view)
         await view.wait()
         
@@ -71,7 +71,7 @@ class unban(commands.Cog):
                 if msg: await msg.delete()
                 return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
         except:
-            disable = confirmation.Disabled(ctx)
+            disable = Prompt(ctx)
             return await msg.edit(content=f"You Are About To Unban: `{len(banned)}` Members",view=disable)
 
 async def setup(client):
