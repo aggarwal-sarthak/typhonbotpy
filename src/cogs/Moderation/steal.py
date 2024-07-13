@@ -4,7 +4,7 @@ import os
 import json
 import aiohttp
 from io import BytesIO
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)

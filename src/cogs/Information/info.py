@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import os
 import datetime
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class info(commands.Cog):
     def __init__(self, client):

@@ -3,7 +3,7 @@ import os
 import discord
 import datetime,timeago
 import pytz
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class snipe(commands.Cog):
     def __init__(self, client):

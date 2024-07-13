@@ -1,16 +1,17 @@
-from discord.ext import commands
 import os
-from src.core.validation import is_command_enabled
+from discord.ext import commands
+from src.core.bot import tether
+from src.core.check import command_enabled
 
-class ping(commands.Cog):
+class Ping(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     @commands.command(description='Returns Bot Ping', usage=f"{os.path.basename(__file__)[:-3]}")
-    @commands.check(is_command_enabled)
+    @command_enabled()
     async def ping(self, ctx):
         latency = self.client.latency
-        await ctx.reply(f'{self.client.emotes["success"]} | {round(latency * 1000)}ms!')
+        await ctx.reply(f'{tether.constants.success} | {round(latency * 1000)}ms!')
 
 async def setup(client):
-    await client.add_cog(ping(client))
+    await client.add_cog(Ping(client))

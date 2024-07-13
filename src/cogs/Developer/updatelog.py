@@ -7,7 +7,7 @@ from discord.ui import Item, Select, select, Button, button, View, ChannelSelect
 from typing import Optional,Callable, Dict, List, Any
 from discord import ButtonStyle,ChannelType, CategoryChannel, Embed, ForumChannel, HTTPException, Interaction, StageChannel, Colour, SelectOption, TextStyle
 from discord.ext.commands import Bot
-from src.core.validation import db_client
+from core.check import db_client
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)
 

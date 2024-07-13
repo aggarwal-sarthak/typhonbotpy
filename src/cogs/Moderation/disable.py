@@ -1,6 +1,6 @@
 import os
 from discord.ext import commands
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class disable(commands.Cog):
     def __init__(self, client):

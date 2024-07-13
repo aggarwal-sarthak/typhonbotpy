@@ -3,7 +3,7 @@ from discord.ext import commands
 import os
 import datetime,timeago
 import pytz
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class userinfo(commands.Cog):
     def __init__(self, client):

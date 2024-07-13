@@ -4,7 +4,7 @@ import os
 from src.core.buttons import Prompt
 import re
 from types import SimpleNamespace
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class role(commands.Cog):
     def __init__(self, client):

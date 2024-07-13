@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import os
 from src.core.buttons import Prompt
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class kick(commands.Cog):
     def __init__(self, client):

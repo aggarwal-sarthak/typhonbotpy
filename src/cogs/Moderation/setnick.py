@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import os
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class setnick(commands.Cog):
     def __init__(self, client):

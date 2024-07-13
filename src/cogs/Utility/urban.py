@@ -2,7 +2,7 @@ from discord.ext import commands
 import os
 import requests
 import discord
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class urban(commands.Cog):
     def __init__(self, client):

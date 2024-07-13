@@ -7,7 +7,7 @@ from discord.ui import Item, Select, select, Button, button, View, ChannelSelect
 from contextlib import suppress
 import json
 import os
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 with open('emoji.json', 'r') as f:
     emotes = json.load(f)

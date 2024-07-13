@@ -1,7 +1,7 @@
 from discord.ext import commands
 import os
 import discord
-from src.core.validation import is_command_enabled
+from core.check import is_command_enabled
 
 class lock(commands.Cog):
     def __init__(self, client):
