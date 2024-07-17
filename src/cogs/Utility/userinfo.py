@@ -25,10 +25,10 @@ class Userinfo(commands.Cog):
         if not permissions: permissions = "None"
         permissions.sort()
 
+        ack = "Server Member"
         if ctx.guild.owner_id == member.id: ack = "Server Owner"
         elif "Administrator" in permissions: ack = "Server Administrator"
         elif "Manage Guild" in permissions: ack = "Server Moderator"
-        else: ack = "Server Member"
 
         embed = discord.Embed(title=None,color=discord.Colour.from_str(tether.color))
         badges = member.public_flags.all()
@@ -38,7 +38,7 @@ class Userinfo(commands.Cog):
         embed.add_field(name="**__General Information__**", value=f"**Name :** {member}\n**ID :** {member.id}\n**Nickname :** {member.nick}\n**Badges :** {badge_text}\n**Account Creation :** {timeago.format(member.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}\n**Server Joined :** {timeago.format(member.joined_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}", inline=False)
         embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**",value=", ".join(roles[:-1]) if len(str(roles)) < 1024 else "Too Many Roles To Display!", inline=False)
         embed.add_field(name=f"**__Permissions__**", value=f'```{", ".join(permissions) if len(str(permissions)) < 1024 else "Too Many Permissions To Display!"}```', inline=False)
-        embed.add_field(name="**__Acknowledgements__**", value=ack)
+        embed.add_field(name="**__Acknowledgements__**", value=f'```{ack}```')
         embed.set_thumbnail(url=member.avatar)
         
         user = await self.client.fetch_user(member.id)
