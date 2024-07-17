@@ -15,51 +15,35 @@ class Userinfo(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     @command_enabled()
     async def userinfo(self, ctx: commands.Context, member:discord.Member=None):
-        if not member:
-            member = ctx.author
+        if not member: member = ctx.author
 
-        roles = []
-        for role in member.roles:
-            roles.append(str(role.mention))
+        roles = [role.mention for role in member.roles]
+        if not roles: roles = "None"
         roles.reverse()
 
-        permissions = [str(permission) for permission, value in member.guild_permissions if value]
-        permission_list = []
-        for permission in permissions:
-            words = permission.split("_")
-            capitalized_words = [word.capitalize() for word in words]
-            formatted_permission = " ".join(capitalized_words)
-            permission_list.append(formatted_permission)
-        permission_list.sort()
+        permissions = [perm[0].replace("_", " ").title() for perm in member.guild_permissions if perm[1]]
+        if not permissions: permissions = "None"
+        permissions.sort()
 
         if ctx.guild.owner_id == member.id: ack = "Server Owner"
-        elif "Administrator" in permission_list: ack = "Server Administrator"
-        elif "Manage Guild" in permission_list: ack = "Server Moderator"
+        elif "Administrator" in permissions: ack = "Server Administrator"
+        elif "Manage Guild" in permissions: ack = "Server Moderator"
         else: ack = "Server Member"
 
         embed = discord.Embed(title=None,color=discord.Colour.from_str(tether.color))
         badges = member.public_flags.all()
-        badge_text=""
-        for badge in badges:
-            badge_text += tether.constants[f'{badge.name}']+" "
+        badge_text = " ".join(getattr(tether.constants, badge.name, None) for badge in badges)
         now = datetime.datetime.now()
+
         embed.add_field(name="**__General Information__**", value=f"**Name :** {member}\n**ID :** {member.id}\n**Nickname :** {member.nick}\n**Badges :** {badge_text}\n**Account Creation :** {timeago.format(member.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}\n**Server Joined :** {timeago.format(member.joined_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}", inline=False)
-        if len(str(", ".join([x.mention for x in member.roles])))>1024:
-            embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**", value="Too Many To Display!", inline=False)
-        else:
-            embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**", value=", ".join(roles[:-1]), inline=False)
-        if len(", ".join([x for x in permission_list]))>1024:
-            embed.add_field(name=f"**__Permissions__**", value="Too Many To Display!", inline=False)
-        else:
-            embed.add_field(name=f"**__Permissions__**", value=", ".join(permission_list), inline=False)
+        embed.add_field(name=f"**__Roles [{len(member.roles)-1}]__**",value=", ".join(roles[:-1]) if len(str(roles)) < 1024 else "Too Many Roles To Display!", inline=False)
+        embed.add_field(name=f"**__Permissions__**", value=f'```{", ".join(permissions) if len(str(permissions)) < 1024 else "Too Many Permissions To Display!"}```', inline=False)
         embed.add_field(name="**__Acknowledgements__**", value=ack)
         embed.set_thumbnail(url=member.avatar)
-        try:
-            user = await self.client.fetch_user(member.id)
-            banner_url = user.banner.url
-            embed.set_image(url=banner_url)
-        except:
-            pass
+        
+        user = await self.client.fetch_user(member.id)
+        if user.banner: embed.set_image(url=user.banner.url)
+
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)
 
