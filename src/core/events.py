@@ -22,9 +22,9 @@ class EventHandler:
         self.client.add_listener(self.on_guild_remove)
 
     async def on_ready(self):
-        logs_channel = self.client.get_channel(int(self.tether.bot_logs))
-        if logs_channel:
-            await logs_channel.send(f"```{self.constants.success_emoji} Bot Started!```")
+        # logs_channel = self.client.get_channel(int(self.tether.bot_logs))
+        # if logs_channel:
+        #     await logs_channel.send(f"```{self.constants.success_emoji} Bot Started!```")
         logging.info(f'{self.constants.success_emoji} {self.client.user.name} Is Ready!')
 
     async def on_command(self, ctx):

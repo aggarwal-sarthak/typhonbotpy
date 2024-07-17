@@ -1,24 +1,24 @@
-from discord.ext import commands
 import os
 import discord
-from core.check import is_command_enabled
+from discord.ext import commands
+from src.core.bot import tether
+from src.core.check import command_enabled
 
-class firstmsg(commands.Cog):
-    def __init__(self, client):
+class Firstmsg(commands.Cog):
+    def __init__(self, client: commands.Bot):
         self.client = client
 
     @commands.command(description='Returns First Message In The Channel By The User', usage=f"{os.path.basename(__file__)[:-3]} firstmsg [user]")
-    @commands.check(is_command_enabled)
-    @commands.bot_has_permissions(embed_links=True, read_message_history=True)
-    async def firstmsg(self, ctx, member: discord.Member=None):
-        if not member:
-            member = ctx.author
+    @commands.bot_has_permissions(read_message_history=True)
+    @command_enabled()
+    async def firstmsg(self, ctx: commands.Context, member: discord.Member=None):
+        if not member: member = ctx.author
 
         async for message in ctx.channel.history(limit=None, oldest_first=True):
             if message.author == member:
-                return await message.reply(f"{self.client.emotes['success']} | Found First Message By `{member.name}`!")
+                return await message.reply(f"{tether.constants.success} | Found First Message By `{member.name}`!")
                 
-        await ctx.reply(f"{self.client.emotes['failed']} | No Message Found By `{member.name}`!")
+        await ctx.reply(f"{tether.constants.failed} | No Message Found By `{member.name}`!")
 
-async def setup(client):
-    await client.add_cog(firstmsg(client))
+async def setup(client: commands.Bot):
+    await client.add_cog(Firstmsg(client))

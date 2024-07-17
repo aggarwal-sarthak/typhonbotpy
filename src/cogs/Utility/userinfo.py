@@ -1,19 +1,20 @@
+import os
+import pytz
 import discord
 from discord.ext import commands
-import os
 import datetime,timeago
-import pytz
-from core.check import is_command_enabled
+from src.core.bot import tether
+from src.core.check import command_enabled
 
-class userinfo(commands.Cog):
-    def __init__(self, client):
+class Userinfo(commands.Cog):
+    def __init__(self, client: commands.Bot):
         self.client = client
 
     @commands.command(description="Returns Information For The Mentioned User", aliases=['user', 'ui', 'about'], usage=f"{os.path.basename(__file__)[:-3]} [User]")
-    @commands.check(is_command_enabled)
     @commands.bot_has_permissions(embed_links=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def userinfo(self, ctx, member:discord.Member=None):
+    @command_enabled()
+    async def userinfo(self, ctx: commands.Context, member:discord.Member=None):
         if not member:
             member = ctx.author
 
@@ -36,11 +37,11 @@ class userinfo(commands.Cog):
         elif "Manage Guild" in permission_list: ack = "Server Moderator"
         else: ack = "Server Member"
 
-        embed = discord.Embed(title=None,color=self.client.config['color'])
+        embed = discord.Embed(title=None,color=discord.Colour.from_str(tether.color))
         badges = member.public_flags.all()
         badge_text=""
         for badge in badges:
-            badge_text += self.client.emotes[f'{badge.name}']+" "
+            badge_text += tether.constants[f'{badge.name}']+" "
         now = datetime.datetime.now()
         embed.add_field(name="**__General Information__**", value=f"**Name :** {member}\n**ID :** {member.id}\n**Nickname :** {member.nick}\n**Badges :** {badge_text}\n**Account Creation :** {timeago.format(member.created_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}\n**Server Joined :** {timeago.format(member.joined_at.astimezone(pytz.timezone('Asia/Kolkata')).replace(tzinfo=None),now)}", inline=False)
         if len(str(", ".join([x.mention for x in member.roles])))>1024:
@@ -62,5 +63,5 @@ class userinfo(commands.Cog):
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)
 
-async def setup(client):
-    await client.add_cog(userinfo(client))
+async def setup(client: commands.Bot):
+    await client.add_cog(Userinfo(client))

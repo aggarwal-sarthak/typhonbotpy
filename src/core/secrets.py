@@ -34,28 +34,28 @@ class Env():
 
     @property
     def owner_ids(self):
-        return self._owner_ids
+        return self._owner_ids.split(", ")
 
     @property
     def color(self):
-        return self._color
+        return str(self._color)
 
     @property
     def join_logs(self):
-        return self._join_logs
+        return int(self._join_logs)
 
     @property
     def leave_logs(self):
-        return self._leave_logs
+        return int(self._leave_logs)
 
     @property
     def error_logs(self):
-        return self._error_logs
+        return int(self._error_logs)
 
     @property
     def update_logs(self):
-        return self._update_logs
+        return int(self._update_logs)
 
     @property
     def bot_logs(self):
-        return self._bot_logs
+        return int(self._bot_logs)
