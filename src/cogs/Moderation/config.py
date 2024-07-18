@@ -6,10 +6,7 @@ class config(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name = "config",
-                    usage=f"{os.path.basename(__file__)[:-3]}",
-                    description = "Shows the Bot configuration for the server",
-                    aliases=["configuration","settings","setting"])
+    @commands.command(name = "config", usage=f"{os.path.basename(__file__)[:-3]}", description = "Shows the Bot configuration for the server", aliases=["configuration","settings","setting"])
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 2, commands.BucketType.member)
     async def config(self, ctx:commands.Context):

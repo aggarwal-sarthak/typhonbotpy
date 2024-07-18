@@ -31,15 +31,9 @@ class EventHandler:
         if not ctx.author.guild_permissions.administrator:
             return
         
-        guild_id = ctx.guild.id
-        guild_db = self.db.guilds.find_one_and_update(
-            {"guild_id": guild_id},
-            {"$set": {"updated": True}},
-            upsert=True,
-            return_document=True
-        )
+        guild_db = self.db.guilds.find_one({"guild_id": ctx.guild.id})
 
-        if not guild_db.get('updated', False):
+        if 'updated' not in guild_db or guild_db['updated'] == False:
             view = Prompt(ctx.author.id)
             msg = await ctx.send(f"{self.constants.bot} | A New Mail Has Arrived. Click To Read!", view=view, ephemeral=True)
             await view.wait()
@@ -50,6 +44,7 @@ class EventHandler:
                         await msg.delete()
                     embed = discord.Embed.from_dict(self.db.updatelog.find_one({}))
                     await ctx.send(embed=embed)
+                    self.db.guilds.update_one({"guild_id": ctx.guild.id}, {"$set": {"updated": True}})
                     target_channel = self.client.get_channel(self.tether.update_logs)
                     if target_channel:
                         await target_channel.send(f"```{ctx.author.name} - {ctx.author.id} in {ctx.guild.name} - {ctx.guild.id}```")
@@ -57,7 +52,9 @@ class EventHandler:
                     if msg:
                         await msg.delete()
             except Exception as e:
-                await self.tether.handle_error(ctx, e)
+                if msg:
+                    await msg.delete()
+                await self.on_command_error(self, ctx, e)
 
     async def on_guild_join(self, guild):
         members_count = len(guild.members)
