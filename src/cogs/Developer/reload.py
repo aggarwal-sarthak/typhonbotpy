@@ -10,9 +10,12 @@ class Reload(commands.Cog):
     @commands.command(description='Reloads A Given Command', usage=f"{os.path.basename(__file__)[:-3]} <cmd>")
     @command_enabled()
     async def reload(self, ctx: commands.Context, cog: str):
-        if ctx.author.id not in tether.owner_ids: return
-        await self.client.reload_extension(f'cogs.{cog}')
-        await ctx.reply(f"{tether.constants.success} | Command {cog} Reloaded Successfully!")
+        try:
+            if ctx.author.id not in tether.owner_ids: return
+            await self.client.reload_extension(f'src.cogs.{cog}')
+            await ctx.reply(f"{tether.constants.success} | Command {cog} Reloaded Successfully!")
+        except Exception as e:
+            print(e)
 
 async def setup(client: commands.Bot):
     await client.add_cog(Reload(client))

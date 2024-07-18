@@ -34,7 +34,7 @@ class Env():
 
     @property
     def owner_ids(self):
-        return self._owner_ids.split(", ")
+        return [int(x) for x in self._owner_ids.split(", ")]
 
     @property
     def color(self):

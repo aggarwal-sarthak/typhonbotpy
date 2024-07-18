@@ -1,11 +1,7 @@
 from __future__ import annotations
-
 import discord
 from discord.ext import commands
-import json
-
-with open('emoji.json', 'r') as f:
-    emotes = json.load(f)
+from src.core.bot import tether
     
 class Simple(discord.ui.View):
     def __init__(self, *,
@@ -15,6 +11,7 @@ class Simple(discord.ui.View):
                  PageCounterStyle: discord.ButtonStyle = discord.ButtonStyle.grey,
                  InitialPage: int = 0,
                  ephemeral: bool = False) -> None:
+        super().__init__(timeout=timeout)
         self.PreviousButton = PreviousButton
         self.NextButton = NextButton
         self.PageCounterStyle = PageCounterStyle
@@ -28,7 +25,6 @@ class Simple(discord.ui.View):
         self.page_counter = None
         self.total_page_count = None
 
-        super().__init__(timeout=timeout)
 
     async def start(self, ctx: discord.Interaction|commands.Context, pages: list[discord.Embed]):
         
@@ -73,13 +69,13 @@ class Simple(discord.ui.View):
 
     async def next_button_callback(self, interaction: discord.Interaction):
         if interaction.user != self.ctx.author:
-            return await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
         await self.next()
         await interaction.response.defer()
 
     async def previous_button_callback(self, interaction: discord.Interaction):
         if interaction.user != self.ctx.author:
-            return await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            return await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
         await self.previous()
         await interaction.response.defer()
 

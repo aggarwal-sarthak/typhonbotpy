@@ -12,7 +12,7 @@ class Load(commands.Cog):
     async def load(self, ctx: commands.Context, cog: str):
         if ctx.author.id not in tether.owner_ids: return
 
-        await self.client.load_extension(f'cogs.{cog}')
+        await self.client.load_extension(f'src.cogs.{cog}')
         await ctx.reply(f"{tether.constants.success} | Command {cog} Loaded Successfully!")
 
 async def setup(client: commands.Bot):

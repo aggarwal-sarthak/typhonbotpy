@@ -11,7 +11,7 @@ class Unload(commands.Cog):
     @command_enabled()
     async def unload(self, ctx: commands.Context, cog: str):
         if ctx.author.id not in tether.owner_ids: return
-        await self.client.unload_extension(f'cogs.{cog}')
+        await self.client.unload_extension(f'src.cogs.{cog}')
         await ctx.reply(f"{tether.constants.success} | Command {cog} Unloaded Successfully!")
 
 async def setup(client: commands.Bot):
