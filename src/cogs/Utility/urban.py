@@ -26,7 +26,7 @@ class Urban(commands.Cog):
         else:
             msg = response['list'][0]['definition']
 
-        embed = discord.Embed(title=query, description=msg, color=discord.Colour.from_str(tether.color))
+        embed = discord.Embed(title=query, description=f'```{msg}```', color=discord.Colour.from_str(tether.color))
         embed.set_footer(text=f"Requested by {ctx.author}",icon_url=ctx.author.avatar)
         await ctx.reply(embed=embed)
 
