@@ -7,9 +7,7 @@ from discord.ui import Item, Select, select, Button, button, View, ChannelSelect
 from typing import Optional,Callable, Dict, List, Any
 from discord import ButtonStyle,ChannelType, CategoryChannel, Embed, ForumChannel, HTTPException, Interaction, StageChannel, Colour, SelectOption, TextStyle
 from discord.ext.commands import Bot
-from core.check import db_client
-with open('emoji.json', 'r') as f:
-    emotes = json.load(f)
+from src.core.bot import tether
 
 class updatelog(commands.Cog):
     def __init__(self, client):
@@ -19,7 +17,7 @@ class updatelog(commands.Cog):
     async def updatelog(self,ctx):
         global author
         author = ctx.author
-        if ctx.author.id not in self.client.config["owner"]: return
+        if ctx.author.id not in tether.owner_ids: return
         view = EmbedCreator(bot=self.client)
         await ctx.send(embed=view.get_default_embed, view=view)
 
@@ -152,7 +150,7 @@ class CreatorMethods:
     async def edit_author(self, interaction: Interaction) -> None:
         """This method edits the embed's author"""
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Author")
         modal.add_item(
@@ -196,7 +194,7 @@ class CreatorMethods:
     async def edit_message(self, interaction: Interaction) -> None:
         """This method edits the embed's message (discord.Embed.title and discord.Embed.description)"""
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Message")
         modal.add_item(
@@ -227,7 +225,7 @@ class CreatorMethods:
     async def edit_thumbnail(self, interaction: Interaction) -> None:
         """This method edits the embed's thumbnail"""
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Thumbnail")
         modal.add_item(
@@ -245,7 +243,7 @@ class CreatorMethods:
     async def edit_image(self, interaction: Interaction) -> None:
         """This method edits the embed's image"""
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Thumbnail")
         modal.add_item(
@@ -263,7 +261,7 @@ class CreatorMethods:
     async def edit_footer(self, interaction: Interaction) -> None:
         """This method edits the embed's footer (text, icon_url)"""
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Footer")
         modal.add_item(
@@ -292,7 +290,7 @@ class CreatorMethods:
     async def edit_colour(self, interaction: Interaction) -> None:
         """This method is edits the embed's colour"""
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         modal = ModalInput(title="Edit Embed Colour")
         modal.add_item(
@@ -315,7 +313,7 @@ class CreatorMethods:
 
     async def add_field(self, interaction: Interaction) -> None:
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         if len(self.embed.fields) >= 25:
             return await interaction.response.send_message(
@@ -362,7 +360,7 @@ class CreatorMethods:
 
     async def remove_field(self, interaction: Interaction) -> None:
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         if not self.embed.fields:
             return await interaction.response.send_message("There is no fields to remove.", ephemeral=True)
@@ -546,16 +544,16 @@ class EmbedCreator(View):
             button (discord.Button): The button object representing the "send" button.
         """
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         dict = self.embed.to_dict()
-        updateLog = db_client.typhonbot.updatelog
+        updateLog = tether.db.updatelog
         if(updateLog is not None):
             updateLog.delete_many({})
         updateLog.insert_one(dict)
         await interaction.message.delete()
-        await interaction.message.channel.send(f"{emotes['success']} | Update Log letter Sent!")
-        db_client.typhonbot.guilds.update_many({},{"$set":{"updated":False}})
+        await interaction.message.channel.send(f"{tether.constants.success} | Update Log letter Sent!")
+        tether.db.guilds.update_many({},{"$set":{"updated":False}})
         
     @button()
     async def cancel_callback(self, interaction: Interaction, button: Button) -> None:
@@ -568,7 +566,7 @@ class EmbedCreator(View):
             button (Button): The button object representing the "cancel" button.
         """
         if interaction.user != author:
-            await interaction.response.send_message(f"{emotes['failed']} | You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(f"{tether.constants.failed} | You Cannot Interact With This Button!", ephemeral=True)
             return await interaction.response.defer()
         await interaction.message.delete()  # type: ignore
         self.stop()
