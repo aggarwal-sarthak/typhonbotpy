@@ -2,49 +2,67 @@ import discord
 from discord.ext import commands
 import os
 from src.core.buttons import Prompt
-from core.check import is_command_enabled
+from src.core.bot import tether
+from src.core.check import command_enabled
 
-class kick(commands.Cog):
-    def __init__(self, client):
+
+class Kick(commands.Cog):
+    def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.command(description="Kicks the Mentioned User",usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]")
-    @commands.check(is_command_enabled)
+    @commands.command(
+        description="Kicks the Mentioned User",
+        usage=f"{os.path.basename(__file__)[:-3]} <user> [reason]",
+    )
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
-    async def kick(self,ctx,user:discord.Member,*reason: str):
-        if(len(reason)!=0):
-            reason = " ".join([x for x in reason])
-        else:
-            reason=None
+    @command_enabled()
+    async def kick(self, ctx: commands.Context, user: discord.Member, *reason: str):
+        reason = (
+            " ".join(reason)
+            if reason
+            else f"[Kicked By {ctx.author.name}({ctx.author.id})]"
+        )
 
         view = Prompt(ctx)
         role = user.top_role
 
-        if(user==ctx.guild.owner):
-            return await ctx.reply(f"{self.client.emotes['failed']} | Cannot Kick the Owner!")
-            
-        if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
-            return await ctx.reply(f"{self.client.emotes['failed']} | My Role Isn't High Enough To Kick!")
+        if user == ctx.guild.owner:
+            return await ctx.reply(
+                f"{tether.constants.failed} | Cannot Kick the Owner!"
+            )
 
-        elif ctx.guild.owner_id != ctx.author.id and ctx.author.top_role.position <= role.position:
-            return await ctx.reply(f"{self.client.emotes['failed']} | Your Role Isn't High Enough To Kick!")
-        
-        msg = await ctx.reply(f"You are about to kick: `{user}`",view=view)
+        if ctx.guild.get_member(self.client.user.id).top_role.position <= role.position:
+            return await ctx.reply(
+                f"{tether.constants.failed} | My Role Isn't High Enough To Kick!"
+            )
+
+        elif (
+            ctx.guild.owner_id != ctx.author.id
+            and ctx.author.top_role.position <= role.position
+        ):
+            return await ctx.reply(
+                f"{tether.constants.failed} | Your Role Isn't High Enough To Kick!"
+            )
+
+        msg = await ctx.reply(f"You Are About To Kick: `{user}`", view=view)
         await view.wait()
 
-        try:
-            if view.value == "1":
-                if msg: await msg.delete()
-                await ctx.guild.kick(user=user,reason=reason)
-                return await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> was kicked successfully!")
+        if view.value:
+            if msg:
+                await msg.delete()
+            await ctx.guild.kick(user=user, reason=reason)
+            return await ctx.reply(
+                f"{tether.constants.success} | <@{user.id}> Was Kicked Successfully!"
+            )
 
-            if view.value == "2":
-                if msg: await msg.delete()
-                return await ctx.reply(f"{self.client.emotes['success']} | Kick Cancelled Successfully!")
-        except:
-            disable = buttons.Disabled(ctx)
-            return await msg.edit(content=f"You Are About To Kick: `{user}`",view=disable)
+        if view.value is False:
+            if msg:
+                await msg.delete()
+            return await ctx.reply(
+                f"{tether.constants.success} | Kick Cancelled Successfully!"
+            )
 
-async def setup(client):
-    await client.add_cog(kick(client))   
+
+async def setup(client: commands.Bot):
+    await client.add_cog(Kick(client))

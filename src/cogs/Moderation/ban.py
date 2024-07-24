@@ -18,7 +18,11 @@ class Ban(commands.Cog):
     @commands.bot_has_permissions(ban_members=True)
     @command_enabled()
     async def ban(self, ctx: commands.Context, user: discord.Member, *reason: str):
-        reason = " ".join(reason) if reason else f"[Banned By {user.name}({user.id})]"
+        reason = (
+            " ".join(reason)
+            if reason
+            else f"[Banned By {ctx.author.name}({ctx.author.id})]"
+        )
         view = Prompt(ctx.author.id)
         role = user.top_role
 

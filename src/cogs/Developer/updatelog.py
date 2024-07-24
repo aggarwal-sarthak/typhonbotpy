@@ -1,4 +1,5 @@
 from __future__ import annotations
+import discord
 from discord.ext import commands
 import os
 from contextlib import suppress
@@ -527,7 +528,7 @@ class EmbedCreator(View):
         embed = Embed(
             title=None,
             description="Select Options from the Drop down menu!",
-            colour=0xFB7C04,
+            colour=discord.Colour.from_str(tether.color),
         )
         return embed
 

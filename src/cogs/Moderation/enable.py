@@ -1,31 +1,49 @@
-from discord.ext import commands
 import os
-from core.check import is_command_enabled
+from discord.ext import commands
+from src.core.bot import tether
+from src.core.check import command_enabled
 
-class enable(commands.Cog):
-    def __init__(self, client):
+
+class Enable(commands.Cog):
+    def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.command(usage=f"{os.path.basename(__file__)[:-3]} <command>", description = "Enables The Mentioned Command", aliases=["en"])
-    @commands.check(is_command_enabled)
+    @commands.command(
+        usage=f"{os.path.basename(__file__)[:-3]} <command>",
+        description="Enables The Mentioned Command",
+        aliases=["en"],
+    )
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    async def enable(self, ctx:commands.Context, cmnd: str):
+    @command_enabled()
+    async def enable(self, ctx: commands.Context, cmnd: str):
         command = self.client.get_command(cmnd)
-        if command is None: await ctx.reply(f"{self.client.emotes['failed']} | {cmnd} Is Not A Command!")
-        
-        guild_db = self.client.db.guilds.find_one({"guild_id":ctx.guild.id})
-        if(not guild_db or 'cmds' not in guild_db):
-            await ctx.reply(f"{self.client.emotes['failed']} | Command `{command.name}` Is Already Enabled!")
-            
-        else:
-            cmds = guild_db['cmds']
-            if command.name in cmds:
-                cmds.remove(command.name)
-                self.client.db.guilds.update_one({"guild_id":ctx.guild.id},{"$set":{"cmds":cmds}})
-                await ctx.reply(f"{self.client.emotes['success']} | Command `{command.name}` Enabled For This Server!")
-            else:
-                await ctx.reply(f"{self.client.emotes['failed']} | Command `{command.name}` Is Already Enabled!")
-            
-async def setup(client):
-    await client.add_cog(enable(client))
+
+        if command is None:
+            return await ctx.reply(
+                f"{tether.constants.failed} | {cmnd} Is Not A Command!"
+            )
+
+        guild_db = tether.db.guilds.find_one({"guild_id": ctx.guild.id})
+        if (
+            not guild_db
+            or "cmds" not in guild_db
+            or command.name not in guild_db["cmds"]
+        ):
+            return await ctx.reply(
+                f"{tether.constants.failed} | Command `{command.name}` Is Already Enabled!"
+            )
+
+        cmds = guild_db["cmds"]
+        cmds.remove(command.name)
+        tether.db.guilds.update_one(
+            {"guild_id": ctx.guild.id}, {"$set": {"cmds": cmds}}
+        )
+
+        await ctx.reply(
+            f"{tether.constants.success} | Command `{command.name}` Enabled For This Server!"
+        )
+
+
+async def setup(client: commands.Bot):
+    await client.add_cog(Enable(client))
