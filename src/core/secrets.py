@@ -1,7 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-class Env():
+
+class Env:
     def __init__(self) -> None:
         load_dotenv()
         self._token = os.environ.get("TOKEN")

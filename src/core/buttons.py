@@ -1,5 +1,6 @@
 import discord
 
+
 class Prompt(discord.ui.View):
     def __init__(self, user_id, timeout=30.0):
         super().__init__(timeout=timeout)
@@ -8,7 +9,9 @@ class Prompt(discord.ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.user_id:
-            await interaction.response.send_message("You Cannot Interact With This Button!", ephemeral=True)
+            await interaction.response.send_message(
+                "You Cannot Interact With This Button!", ephemeral=True
+            )
             return False
         return True
 

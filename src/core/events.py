@@ -8,6 +8,7 @@ from src.core.buttons import Prompt
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 class EventHandler:
     def __init__(self, tether_instance):
         self.tether = tether_instance
@@ -25,17 +26,23 @@ class EventHandler:
         # logs_channel = self.client.get_channel(int(self.tether.bot_logs))
         # if logs_channel:
         #     await logs_channel.send(f"```{self.constants.success_emoji} Bot Started!```")
-        logging.info(f'{self.constants.success_emoji} {self.client.user.name} Is Ready!')
+        logging.info(
+            f"{self.constants.success_emoji} {self.client.user.name} Is Ready!"
+        )
 
     async def on_command(self, ctx):
         if not ctx.author.guild_permissions.administrator:
             return
-        
+
         guild_db = self.db.guilds.find_one({"guild_id": ctx.guild.id})
 
-        if 'updated' not in guild_db or guild_db['updated'] == False:
+        if "updated" not in guild_db or guild_db["updated"] == False:
             view = Prompt(ctx.author.id)
-            msg = await ctx.send(f"{self.constants.bot} | A New Mail Has Arrived. Click To Read!", view=view, ephemeral=True)
+            msg = await ctx.send(
+                f"{self.constants.bot} | A New Mail Has Arrived. Click To Read!",
+                view=view,
+                ephemeral=True,
+            )
             await view.wait()
 
             try:
@@ -44,10 +51,14 @@ class EventHandler:
                         await msg.delete()
                     embed = discord.Embed.from_dict(self.db.updatelog.find_one({}))
                     await ctx.send(embed=embed)
-                    self.db.guilds.update_one({"guild_id": ctx.guild.id}, {"$set": {"updated": True}})
+                    self.db.guilds.update_one(
+                        {"guild_id": ctx.guild.id}, {"$set": {"updated": True}}
+                    )
                     target_channel = self.client.get_channel(self.tether.update_logs)
                     if target_channel:
-                        await target_channel.send(f"```{ctx.author.name} - {ctx.author.id} in {ctx.guild.name} - {ctx.guild.id}```")
+                        await target_channel.send(
+                            f"```{ctx.author.name} - {ctx.author.id} in {ctx.guild.name} - {ctx.guild.id}```"
+                        )
                 elif view.value is False:
                     if msg:
                         await msg.delete()
@@ -66,16 +77,20 @@ class EventHandler:
 
         icon_url = guild.icon.url if guild.icon else None
 
-        embed = discord.Embed(title="JOINED A SERVER", color=0xfb7c04)
+        embed = discord.Embed(title="JOINED A SERVER", color=0xFB7C04)
         embed.add_field(name="SERVER NAME:", value=guild.name, inline=False)
         embed.add_field(name="SERVER ID:", value=guild.id, inline=False)
         embed.add_field(name="SERVER MEMBERS: ", value=members_count, inline=False)
-        if invite_link: embed.add_field(name="INVITE LINK:", value=invite_link, inline=False)
-        if icon_url: embed.set_thumbnail(url=icon_url)
+        if invite_link:
+            embed.add_field(name="INVITE LINK:", value=invite_link, inline=False)
+        if icon_url:
+            embed.set_thumbnail(url=icon_url)
 
         client_total_servers = len(self.client.guilds)
         client_total_members = sum(len(g.members) for g in self.client.guilds)
-        embed.set_footer(text=f"BOT SERVERS: {client_total_servers} | BOT MEMBERS: {client_total_members}")
+        embed.set_footer(
+            text=f"BOT SERVERS: {client_total_servers} | BOT MEMBERS: {client_total_members}"
+        )
 
         target_channel = self.client.get_channel(self.tether.join_logs)
         if target_channel:
@@ -87,15 +102,18 @@ class EventHandler:
         members_count = len(guild.members)
         icon_url = guild.icon.url if guild.icon else None
 
-        embed = discord.Embed(title="LEFT A SERVER", color=0xfb7c04)
+        embed = discord.Embed(title="LEFT A SERVER", color=0xFB7C04)
         embed.add_field(name="SERVER NAME:", value=guild.name, inline=False)
         embed.add_field(name="SERVER ID:", value=guild.id, inline=False)
         embed.add_field(name="SERVER MEMBERS: ", value=members_count, inline=False)
-        if icon_url: embed.set_thumbnail(url=icon_url)
+        if icon_url:
+            embed.set_thumbnail(url=icon_url)
 
         client_total_servers = len(self.client.guilds)
         client_total_members = sum(len(g.members) for g in self.client.guilds)
-        embed.set_footer(text=f"BOT SERVERS: {client_total_servers} | BOT MEMBERS: {client_total_members}")
+        embed.set_footer(
+            text=f"BOT SERVERS: {client_total_servers} | BOT MEMBERS: {client_total_members}"
+        )
 
         target_channel = self.client.get_channel(self.tether.leave_logs)
         if target_channel:
@@ -104,17 +122,21 @@ class EventHandler:
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             return
-        
+
         if not isinstance(error, commands.CommandOnCooldown):
             ctx.command.reset_cooldown(ctx)
 
-        if isinstance(error, commands.CommandInvokeError) and isinstance(error.original, asyncio.TimeoutError):
+        if isinstance(error, commands.CommandInvokeError) and isinstance(
+            error.original, asyncio.TimeoutError
+        ):
             await ctx.reply(f"{self.constants.failed} Command Timed Out!")
             return
 
         if isinstance(error, commands.MissingRequiredArgument):
-            help_command = self.client.get_command('help')
-            parent_name = ctx.command.parent.name if ctx.command.parent else ctx.command.name
+            help_command = self.client.get_command("help")
+            parent_name = (
+                ctx.command.parent.name if ctx.command.parent else ctx.command.name
+            )
             await ctx.invoke(help_command, parent_name, ctx.command.name)
             return
 
@@ -128,12 +150,22 @@ class EventHandler:
                 await reply.delete()
             return
 
-        if isinstance(error, (commands.MissingPermissions, commands.BotMissingPermissions)):
-            permission_type = "Bot" if isinstance(error, commands.BotMissingPermissions) else "You"
-            err = str(error).replace(f'{permission_type} requires ', '').replace(' permission(s) to run this command.', '')
-            await ctx.reply(f"{self.constants.failed} {permission_type} Don't Have `{err}` Permission To Run This Command!")
+        if isinstance(
+            error, (commands.MissingPermissions, commands.BotMissingPermissions)
+        ):
+            permission_type = (
+                "Bot" if isinstance(error, commands.BotMissingPermissions) else "You"
+            )
+            err = (
+                str(error)
+                .replace(f"{permission_type} requires ", "")
+                .replace(" permission(s) to run this command.", "")
+            )
+            await ctx.reply(
+                f"{self.constants.failed} {permission_type} Don't Have `{err}` Permission To Run This Command!"
+            )
             return
-        
+
         target_channel = self.client.get_channel(self.tether.error_logs)
         if target_channel:
-            await target_channel.send(f'```{ctx.command.name} : {error}```')
+            await target_channel.send(f"```{ctx.command.name} : {error}```")
