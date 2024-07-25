@@ -69,7 +69,7 @@ class Help(commands.Cog):
         )
 
         if isinstance(cmd, commands.Group):
-            subs = "\n".join([f"{prefix}{sub.name}" for sub in cmd.commands])
+            subs = "\n".join([f"{prefix}{cmd} {sub.name}" for sub in cmd.commands])
             desc += f"\n**Subcommands:**\n```{subs}```"
 
         embed = discord.Embed(
