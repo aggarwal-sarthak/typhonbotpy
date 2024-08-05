@@ -24,7 +24,7 @@ class Kick(commands.Cog):
             else f"[Kicked By {ctx.author.name}({ctx.author.id})]"
         )
 
-        view = Prompt(ctx)
+        view = Prompt(ctx.author.id)
         role = user.top_role
 
         if user == ctx.guild.owner:

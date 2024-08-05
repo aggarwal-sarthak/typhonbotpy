@@ -1,7 +1,8 @@
 from discord.ext import commands
 import os
 from src.core.buttons import Prompt
-from core.check import is_command_enabled
+from src.core.check import is_command_enabled
+from src.core.bot import tether 
 
 class unban(commands.Cog):
     def __init__(self, client):
@@ -14,28 +15,28 @@ class unban(commands.Cog):
     async def unban(self, ctx, user: int, *reason: str):
         banned = [entry.user.id async for entry in ctx.guild.bans()]
         if user not in banned:
-            return await ctx.reply(f"{self.client.emotes['failed']} | {user} Was Not Found In Ban list!")
+            return await ctx.reply(f"{tether.constants.failed} | {user} Was Not Found In Ban list!")
             
         if(len(reason)!=0):
             reason = " ".join([x for x in reason])
         else:
             reason = None
 
-        view = Prompt(ctx)
+        view = Prompt(ctx.author.id)
         user = await self.client.fetch_user(user)
 
         msg = await ctx.reply(f"You Are About To Unban: `{user}`",view=view)
         await view.wait()
 
         try:
-            if view.value == "1":
+            if view.value:
                 if msg: await msg.delete()
                 await ctx.guild.unban(user=user,reason=reason)
-                return await ctx.reply(f"{self.client.emotes['success']} | <@{user.id}> Was Unbanned Successfully!")
+                return await ctx.reply(f"{tether.constants.success} | <@{user.id}> Was Unbanned Successfully!")
     
             if view.value == "2":
                 if msg: await msg.delete()
-                return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
+                return await ctx.reply(f"{tether.constants.success} | Unban Cancelled Successfully!")
         except:
             disable = Prompt(ctx)
             return await msg.edit(content=f"You Are About To Unban: `{user}`",view=disable)
@@ -46,33 +47,30 @@ class unban(commands.Cog):
     async def all(self, ctx, *reason: str):
         banned = [entry.user.id async for entry in ctx.guild.bans()]
         if len(banned) < 0:
-            await ctx.reply(f"{self.client.emotes['failed']} | No Banned Members Found!")
+            await ctx.reply(f"{tether.constants.failed} | No Banned Members Found!")
         if(len(reason) != 0):
             reason = " ".join([x for x in reason])
         else:
             reason = None
 
-        view = Prompt(ctx)
+        view = Prompt(ctx.author.id)
         msg = await ctx.reply(f"You Are About To Unban: `{len(banned)}` Members",view=view)
         await view.wait()
         
-        try:
-            if view.value == "1":
-                if msg: await msg.delete()
-                msg = await ctx.reply(f'{self.client.emotes["loading"]} | Unbanning `{len(banned)}` Members!')
+        
+        if view.value:
+            if msg: await msg.delete()
+            msg = await ctx.reply(f'{tether.constants.loading} | Unbanning `{len(banned)}` Members!')
 
-                for user in banned:
-                    user = await self.client.fetch_user(user)
-                    await ctx.guild.unban(user=user,reason=reason)
-                if msg: await msg.delete()
-                return await ctx.reply(f"{self.client.emotes['success']} | `{len(banned)}` Members Were Unbanned Successfully!")
-    
-            if view.value == "2":
-                if msg: await msg.delete()
-                return await ctx.reply(f"{self.client.emotes['success']} | Unban Cancelled Successfully!")
-        except:
-            disable = Prompt(ctx)
-            return await msg.edit(content=f"You Are About To Unban: `{len(banned)}` Members",view=disable)
+            for user in banned:
+                user = await self.client.fetch_user(user)
+                await ctx.guild.unban(user=user,reason=reason)
+            if msg: await msg.delete()
+            return await ctx.reply(f"{tether.constants.success} | `{len(banned)}` Members Were Unbanned Successfully!")
+
+        if view.value is False:
+            if msg: await msg.delete()
+            return await ctx.reply(f"{tether.constants.success} | Unban Cancelled Successfully!")
 
 async def setup(client):
     await client.add_cog(unban(client))   
